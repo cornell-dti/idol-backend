@@ -16,13 +16,7 @@ const isProd: boolean = JSON.parse(process.env.IS_PROD);
 if (isProd) {
   let allowedOrigins = [/https:\/\/idol\.cornelldti\.org/, /.*cornelldti-idol\.netlify\.app/];
   app.use(cors({
-    origin: (origin, cb) => {
-      let foundOrigin = allowedOrigins.find(reg => reg.test(origin));
-      if (foundOrigin) {
-        return cb(null, true);
-      }
-      return cb(new Error("No such allowed origin!"), false);
-    },
+    origin: '*',
     credentials: true,
     methods: ['POST', 'GET', 'OPTIONS', 'DELETE']
   }));
