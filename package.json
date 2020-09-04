@@ -4,14 +4,13 @@
   "description": "The backend for the DTI Internal DTI Organization Logic",
   "main": "index.js",
   "scripts": {
-    "functions": "npm install",
-    "build": "tsc"
+    "start": "./node_modules/.bin/netlify-lambda serve build",
+    "functions": "npm install && tsc"
   },
   "author": "Jagger Brulato",
   "license": "ISC",
   "dependencies": {
     "@types/express": "^4.17.8",
-    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.1.1",
     "netlify-lambda": "^2.0.1",
