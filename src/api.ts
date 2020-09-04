@@ -73,6 +73,8 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/members/all', async (req, res) => {
+  res.status(200).json([]);
+  return;
   if (req.session?.isLoggedIn) {
     res.json({
       members: await db.collection('members').get().then((vals) => {
