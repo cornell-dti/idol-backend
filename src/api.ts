@@ -13,7 +13,8 @@ let numReq = 1;
 router.get('/*', (req, res) => {
   res.json({
     test: 'hello',
-    numReq: numReq
+    numReq: numReq,
+    pk: process.env.FIREBASE_PRIVATE_KEY
   });
   numReq++;
 });
