@@ -20,7 +20,7 @@ app.use(function (req, res, next) {
   if (req.headers.origin) {
     for (let regExp of allowedOrigins) {
       if (req.headers.origin.match(regExp) != null) {
-        res.header("Access-Control-Allow-Origin", req.headers.origin);
+        res.header("Access-Control-Allow-Origin", isProd ? 'https://idol.cornelldti.org' : req.headers.origin);
         res.header("Access-Control-Allow-Credentials", "true");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         break;
