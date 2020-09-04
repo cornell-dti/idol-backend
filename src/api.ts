@@ -1,8 +1,10 @@
 import express from 'express';
 import serverless from 'serverless-http';
+import { db as database } from './firebase';
 
 const app = express();
 const router = express.Router();
+const db = database;
 
 let numReq = 1;
 
