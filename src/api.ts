@@ -12,18 +12,23 @@ const router = express.Router();
 const db = database;
 const PORT = process.env.PORT || 9000;
 const isProd: boolean = JSON.parse(process.env.IS_PROD);
+const allowedOrigins = isProd
+  ? [/https:\/\/idol\.cornelldti\.org/, /.*--cornelldti-idol\.netlify\.app/]
+  : [/http:\/\/localhost:3000/];
 
-if (isProd) {
-  app.use(cors({
-    origin: [/https:\/\/idol\.cornelldti\.org/],
-    credentials: true,
-  }));
-} else {
-  app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-  }));
-}
+app.use(function (req, res, next) {
+  if (req.headers.origin) {
+    for (let regExp of allowedOrigins) {
+      if (req.headers.origin.match(regExp) != null) {
+        res.header("Access-Control-Allow-Origin", req.headers.origin);
+        res.header("Access-Control-Allow-Credentials", "true");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        break;
+      }
+    }
+  }
+  next();
+});
 
 app.use(bodyParser.json());
 
