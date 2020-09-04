@@ -16,20 +16,23 @@ const allowedOrigins = isProd
   ? [/https:\/\/idol\.cornelldti\.org/, /.*--cornelldti-idol\.netlify\.app/]
   : [/http:\/\/localhost:3000/];
 
-app.use(function (req, res, next) {
+let corsCheck = function (req, res, next) {
   if (req.headers.origin) {
     for (let regExp of allowedOrigins) {
       if (req.headers.origin.match(regExp) != null) {
         res.header("Access-Control-Allow-Origin", req.headers.origin);
         res.header("Access-Control-Allow-Credentials", "true");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.header("Access-Control-Allow-Headers", ["Origin", "X-Requested-With",
+          "Content-Type", "Accept"]);
+        res.header("Access-Control-Allow-Methods", ["GET", "POST", "OPTIONS", "DELETE"]);
         break;
       }
     }
   }
   next();
-});
+}
 
+app.use(corsCheck);
 app.use(bodyParser.json());
 
 app.use(session({
