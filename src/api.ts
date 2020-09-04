@@ -12,7 +12,7 @@ const isProd: boolean = JSON.parse(process.env.IS_PROD);
 
 if (isProd) {
   app.use(cors({
-    origin: 'https://idol.cornelldti.org'
+    origin: ['https://idol.cornelldti.org', /.*cornelldti-idol\.netlify\.app/]
   }));
 } else {
   app.use(cors({
