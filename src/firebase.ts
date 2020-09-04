@@ -11,7 +11,6 @@ let configureAccount = (sa) => {
   }
   configAcc['private_key'] = parsedPK;
   configAcc['private_key_id'] = process.env.FIREBASE_PRIVATE_KEY_ID;
-  console.log(configAcc);
   return configAcc;
 };
 

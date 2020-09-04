@@ -11,10 +11,15 @@ const PORT = process.env.PORT || 9000;
 let numReq = 1;
 
 
-router.get('/*', (req, res) => {
+router.get('/*', async (req, res) => {
   res.json({
     test: 'hello',
     numReq: numReq,
+    members: await db.collection('members').get().then((vals) => {
+      return vals.docs.map(doc => {
+        return doc.data();
+      });
+    })
   });
   numReq++;
 });
