@@ -16,12 +16,14 @@ const isProd: boolean = JSON.parse(process.env.IS_PROD);
 if (isProd) {
   app.use(cors({
     origin: ['https://idol.cornelldti.org', /.*cornelldti-idol\.netlify\.app/],
-    credentials: true
+    credentials: true,
+    methods: ['POST', 'GET', 'OPTIONS', 'DELETE']
   }));
 } else {
   app.use(cors({
     origin: 'http://localhost:3000',
-    credentials: true
+    credentials: true,
+    methods: ['POST', 'GET', 'OPTIONS', 'DELETE']
   }));
 }
 
