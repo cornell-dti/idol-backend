@@ -15,7 +15,7 @@ router.get('/*', (req, res) => {
   res.json({
     test: 'hello',
     numReq: numReq,
-    pk: process.env.FIREBASE_PRIVATE_KEY
+    pk: JSON.parse(process.env.FIREBASE_PRIVATE_KEY)
   });
   numReq++;
 });
