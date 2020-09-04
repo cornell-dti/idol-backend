@@ -4,7 +4,7 @@
   "description": "The backend for the DTI Internal DTI Organization Logic",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/netlify-lambda serve build",
+    "start": "node build/api.js",
     "functions": "npm install && tsc"
   },
   "author": "Jagger Brulato",
