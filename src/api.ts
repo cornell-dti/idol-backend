@@ -21,8 +21,4 @@ router.get('/members/all', async (req, res) => {
 
 app.use('/.netlify/functions/api', router);
 
-app.listen(PORT, () => {
-  console.log("IDOL backend listening on port: " + PORT);
-});
-
 module.exports.handler = serverless(app);
