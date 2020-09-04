@@ -79,11 +79,6 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/allMembers', async (req, res) => {
-  res.header("Access-Control-Allow-Origin", "idol.api.cornelldti.org");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Headers", ["Origin", "X-Requested-With",
-    "Content-Type", "Accept"]);
-  res.header("Access-Control-Allow-Methods", ["GET", "POST", "OPTIONS", "DELETE"]);
   res.status(200).json([]);
   return;
   if (req.session?.isLoggedIn) {
