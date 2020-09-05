@@ -123,32 +123,16 @@ router.post('/setMember', async (req, res) => {
   if (req.session?.isLoggedIn) {
     let member = await (await db.doc('members/' + req.session.email).get()).data();
     if (!member) {
-      res.status(200).json({ error: "Not member with email: " + req.session.email });
+      res.status(200).json({ error: "No member with email: " + req.session.email });
     } else {
       let canEdit = PermissionsManager.canEditMembers(member.role);
       if (!canEdit) {
         res.status(200).json({ error: "User with email: " + req.session.email + " does not have permission to edit members!" });
       } else {
-        db.doc('members/' + req.body.email).set(req.body).then(() => {
-          res.status(200).json({ status: "Success", member: req.body });
-        });
-      }
-    }
-  } else {
-    res.status(200).json({ error: "Not logged in!" });
-  }
-});
-
-router.post('/setMember', async (req, res) => {
-  if (req.session?.isLoggedIn) {
-    let member = await (await db.doc('members/' + req.session.email).get()).data();
-    if (!member) {
-      res.status(200).json({ error: "Not member with email: " + req.session.email });
-    } else {
-      let canEdit = PermissionsManager.canEditMembers(member.role);
-      if (!canEdit) {
-        res.status(200).json({ error: "User with email: " + req.session.email + " does not have permission to edit members!" });
-      } else {
+        if (!req.body.email || req.body.email === '') {
+          res.status(200).json({ error: "Couldn't edit user with undefined email!" });
+          return;
+        }
         db.doc('members/' + req.body.email).set(req.body).then(() => {
           res.status(200).json({ status: "Success", member: req.body });
         }).catch((reason) => {
@@ -171,6 +155,10 @@ router.post('/deleteMember', async (req, res) => {
       if (!canEdit) {
         res.status(200).json({ error: "User with email: " + req.session.email + " does not have permission to edit members!" });
       } else {
+        if (!req.body.email || req.body.email === '') {
+          res.status(200).json({ error: "Couldn't delete user with undefined email!" });
+          return;
+        }
         db.doc('members/' + req.body.email).delete().then(() => {
           res.status(200).json({ status: "Success", member: req.body });
         }).catch((reason) => {
