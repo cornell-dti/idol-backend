@@ -6,6 +6,7 @@ import session, { MemoryStore } from 'express-session';
 import { db as database, app as adminApp } from './firebase';
 import bodyParser from 'body-parser';
 import admin from "firebase-admin";
+import { PermissionsManager, allRoles } from './permissions';
 
 const app = express();
 const router = express.Router();
@@ -64,6 +65,7 @@ router.post('/login', async (req, res) => {
       return;
     }
     req.session.isLoggedIn = true;
+    req.session.email = foundMember.email;
     req.session.save((err) => {
       err ? sessionErrCb(err) : null;
       res.json({ isLoggedIn: true });
@@ -91,7 +93,79 @@ router.get('/allMembers', async (req, res) => {
       })
     });
   } else {
-    res.status(401).json({ error: "Not logged in!" });
+    res.status(200).json({ error: "Not logged in!" });
+  }
+});
+
+router.get('/allRoles', async (req, res) => {
+  if (req.session?.isLoggedIn) {
+    res.status(200).json({ roles: allRoles });
+  } else {
+    res.status(200).json({ error: "Not logged in!" });
+  }
+});
+
+router.post('/setMember', async (req, res) => {
+  if (req.session?.isLoggedIn) {
+    let member = await (await db.doc('members/' + req.session.email).get()).data();
+    if (!member) {
+      res.status(200).json({ error: "Not member with email: " + req.session.email });
+    } else {
+      let canEdit = PermissionsManager.canEditMembers(member.role);
+      if (!canEdit) {
+        res.status(200).json({ error: "User with email: " + req.session.email + " does not have permission to edit members!" });
+      } else {
+        db.doc('members/' + req.body.email).set(req.body).then(() => {
+          res.status(200).json({ status: "Success", member: req.body });
+        });
+      }
+    }
+  } else {
+    res.status(200).json({ error: "Not logged in!" });
+  }
+});
+
+router.post('/setMember', async (req, res) => {
+  if (req.session?.isLoggedIn) {
+    let member = await (await db.doc('members/' + req.session.email).get()).data();
+    if (!member) {
+      res.status(200).json({ error: "Not member with email: " + req.session.email });
+    } else {
+      let canEdit = PermissionsManager.canEditMembers(member.role);
+      if (!canEdit) {
+        res.status(200).json({ error: "User with email: " + req.session.email + " does not have permission to edit members!" });
+      } else {
+        db.doc('members/' + req.body.email).set(req.body).then(() => {
+          res.status(200).json({ status: "Success", member: req.body });
+        }).catch((reason) => {
+          res.status(200).json({ error: "Couldn't edit user for reason: " + reason });
+        });
+      }
+    }
+  } else {
+    res.status(200).json({ error: "Not logged in!" });
+  }
+});
+
+router.post('/deleteMember', async (req, res) => {
+  if (req.session?.isLoggedIn) {
+    let member = await (await db.doc('members/' + req.session.email).get()).data();
+    if (!member) {
+      res.status(200).json({ error: "Not member with email: " + req.session.email });
+    } else {
+      let canEdit = PermissionsManager.canEditMembers(member.role);
+      if (!canEdit) {
+        res.status(200).json({ error: "User with email: " + req.session.email + " does not have permission to edit members!" });
+      } else {
+        db.doc('members/' + req.body.email).delete().then(() => {
+          res.status(200).json({ status: "Success", member: req.body });
+        }).catch((reason) => {
+          res.status(200).json({ error: "Couldn't delete user for reason: " + reason });
+        });
+      }
+    }
+  } else {
+    res.status(200).json({ error: "Not logged in!" });
   }
 });
 
