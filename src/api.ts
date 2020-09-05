@@ -6,7 +6,21 @@ import session, { MemoryStore } from 'express-session';
 import { db as database, app as adminApp } from './firebase';
 import bodyParser from 'body-parser';
 import admin from "firebase-admin";
-import { PermissionsManager, allRoles } from './permissions';
+
+export type role = 'lead' | 'admin' | 'tpm' | 'pm' | 'developer' | 'designer';
+export const allRoles: role[] = ['lead', 'admin', 'tpm', 'pm', 'developer', 'designer'];
+
+export class PermissionsManager {
+
+  static canEditMembers(role: role): boolean {
+    if (role === 'lead' || role === 'admin') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+}
 
 const app = express();
 const router = express.Router();
