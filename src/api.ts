@@ -32,7 +32,10 @@ let corsCheck = function (req, res, next) {
   next();
 }
 
-app.use(corsCheck);
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 app.use(bodyParser.json());
 
 app.use(session({
