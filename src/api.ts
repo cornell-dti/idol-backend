@@ -51,6 +51,16 @@ app.use(session({
 }));
 let sessionErrCb = (err) => { console.log(err); };
 
+let checkLoggedIn = (req, res): boolean => {
+  if (req.session?.isLoggedIn) {
+    return true;
+  } else {
+    // Session expired
+    res.status(440).json({ error: "Not logged in!" });
+    return false;
+  }
+}
+
 router.post('/login', async (req, res) => {
   let members = await db.collection('members').get().then((vals) => {
     return vals.docs.map(doc => {
@@ -84,7 +94,7 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/allMembers', async (req, res) => {
-  if (req.session?.isLoggedIn) {
+  if (checkLoggedIn(req, res)) {
     res.json({
       members: await db.collection('members').get().then((vals) => {
         return vals.docs.map(doc => {
@@ -92,21 +102,17 @@ router.get('/allMembers', async (req, res) => {
         });
       })
     });
-  } else {
-    res.status(200).json({ error: "Not logged in!" });
   }
 });
 
 router.get('/allRoles', async (req, res) => {
-  if (req.session?.isLoggedIn) {
+  if (checkLoggedIn(req, res)) {
     res.status(200).json({ roles: allRoles });
-  } else {
-    res.status(200).json({ error: "Not logged in!" });
   }
 });
 
 router.post('/setMember', async (req, res) => {
-  if (req.session?.isLoggedIn) {
+  if (checkLoggedIn(req, res)) {
     let member = await (await db.doc('members/' + req.session.email).get()).data();
     if (!member) {
       res.status(200).json({ error: "No member with email: " + req.session.email });
@@ -126,13 +132,11 @@ router.post('/setMember', async (req, res) => {
         });
       }
     }
-  } else {
-    res.status(200).json({ error: "Not logged in!" });
   }
 });
 
 router.post('/deleteMember', async (req, res) => {
-  if (req.session?.isLoggedIn) {
+  if (checkLoggedIn(req, res)) {
     let member = await (await db.doc('members/' + req.session.email).get()).data();
     if (!member) {
       res.status(200).json({ error: "Not member with email: " + req.session.email });
@@ -152,8 +156,6 @@ router.post('/deleteMember', async (req, res) => {
         });
       }
     }
-  } else {
-    res.status(200).json({ error: "Not logged in!" });
   }
 });
 
