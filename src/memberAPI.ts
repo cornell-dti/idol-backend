@@ -2,6 +2,13 @@ import { checkLoggedIn } from "./api";
 import { db } from "./firebase";
 import { PermissionsManager } from "./permissions";
 
+export type Member = {
+  email: string,
+  first_name: string,
+  last_name: string,
+  role: string
+}
+
 export let allMembers = async (req, res) => {
   if (checkLoggedIn(req, res)) {
     res.json({

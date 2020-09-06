@@ -8,16 +8,19 @@ import bodyParser from 'body-parser';
 import admin from "firebase-admin";
 import { allMembers, setMember, deleteMember } from './memberAPI';
 import { getAllRoles } from './roleAPI';
+import { allTeams, setTeam, deleteTeam } from './teamAPI';
 
-// Constants
+// Constants and configurations
 const app = express();
 const router = express.Router();
 const db = database;
 const PORT = process.env.PORT || 9000;
 const isProd: boolean = JSON.parse(process.env.IS_PROD);
-const allowedOrigins = isProd
+const allowAllOrigins = true;
+const enforceSession = false;
+const allowedOrigins = allowAllOrigins ? [/.*/] : (isProd
   ? [/https:\/\/idol\.cornelldti\.org/, /.*--cornelldti-idol\.netlify\.app/]
-  : [/http:\/\/localhost:3000/];
+  : [/http:\/\/localhost:3000/]);
 
 // Middleware
 app.use(cors({
@@ -39,6 +42,9 @@ let sessionErrCb = (err) => { console.log(err); };
 
 // Check valid session
 export let checkLoggedIn = (req, res): boolean => {
+  if (!enforceSession) {
+    return true;
+  }
   if (req.session?.isLoggedIn) {
     return true;
   } else {
@@ -87,10 +93,14 @@ router.get('/allRoles', getAllRoles);
 
 // Members
 router.get('/allMembers', allMembers);
-
 router.post('/setMember', setMember);
-
 router.post('/deleteMember', deleteMember);
+
+// Teams
+router.get('/allTeams', allTeams);
+router.post('/setTeam', setTeam);
+router.post('/deleteTeam', deleteTeam);
+
 
 app.use('/.netlify/functions/api', router);
 

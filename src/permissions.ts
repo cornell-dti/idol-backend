@@ -11,4 +11,12 @@ export class PermissionsManager {
     }
   }
 
+  static canEditTeams(role: role): boolean {
+    if (role === 'lead' || role === 'admin') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }
