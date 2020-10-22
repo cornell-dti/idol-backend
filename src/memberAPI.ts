@@ -6,7 +6,20 @@ export type Member = {
   email: string,
   first_name: string,
   last_name: string,
-  role: string
+  name: string,
+  role: string,
+  graduation: string,
+  major: string,
+  doubleMajor?: string, //optional
+  minor?: string, //optional
+  website: string,
+  linkedin: string,
+  github: string,
+  hometown: string,
+  about: string,
+  subteam: string,
+  roleId: string,
+  roleDeveloper: string
 }
 
 export let allMembers = async (req, res) => {
