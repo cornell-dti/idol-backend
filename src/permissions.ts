@@ -24,12 +24,4 @@ export class PermissionsManager {
       return false;
     }
   }
-
-  static canEditMemberRole(role: role): boolean {
-    if (role === "lead" || role === "admin") {
-      return true;
-    } else {
-      return false;
-    }
-  }
 }

@@ -7,15 +7,14 @@ export type Member = {
   email: string;
   first_name: string;
   last_name: string;
-  name: string;
   role: string;
   graduation: string;
   major: string;
   double_major?: string; //optional
   minor?: string; //optional
-  website: string;
-  linkedin_link: string;
-  github_link: string;
+  website?: string; //optional
+  linkedin_link?: string; //optional
+  github_link?: string; //optional
   hometown: string;
   about: string;
   subteam: string;
@@ -104,14 +103,13 @@ export let updateMember = async (req: Request, res: Response) => {
           return;
         }
         if (
-          req.body.role &&
-          !PermissionsManager.canEditMemberRole(member.role)
+          (req.body.role || req.body.first_name || req.body.last_name) && !canEdit
         ) {
           res.status(200).json({
             error:
               "User with email: " +
               req.session.email +
-              " does not have persmission to edit member roles!",
+              " does not have persmission to edit member name or roles!",
           });
         }
         db.doc("members/" + req.body.email)

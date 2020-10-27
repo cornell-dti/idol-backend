@@ -17,12 +17,12 @@ const db = database;
 const PORT = process.env.PORT || 9000;
 const isProd: boolean = JSON.parse(process.env.IS_PROD);
 const allowAllOrigins = false;
-const enforceSession = false;
+const enforceSession = true;
 const allowedOrigins = allowAllOrigins
   ? [/.*/]
   : isProd
-  ? [/https:\/\/idol\.cornelldti\.org/, /.*--cornelldti-idol\.netlify\.app/]
-  : [/http:\/\/localhost:3000/];
+    ? [/https:\/\/idol\.cornelldti\.org/, /.*--cornelldti-idol\.netlify\.app/]
+    : [/http:\/\/localhost:3000/];
 
 // Middleware
 app.use(
