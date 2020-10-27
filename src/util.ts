@@ -51,7 +51,7 @@ export async function materialize(
     let foundAProp = false;
 
     for (let prop in objectStruct) {
-      if (Object.prototype.hasOwnProperty.call(objectStruct, prop)) {
+      if (objectStruct[prop] && Object.prototype.hasOwnProperty.call(objectStruct, prop)) {
         if (isDocRef(objectStruct[prop])) {
           let ref = objectStruct[prop] as firestore.DocumentReference;
           let dataProm = ref
