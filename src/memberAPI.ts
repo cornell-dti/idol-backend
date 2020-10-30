@@ -109,7 +109,7 @@ export let updateMember = async (req: Request, res: Response) => {
             error:
               "User with email: " +
               req.session.email +
-              " does not have persmission to edit member name or roles!",
+              " does not have permission to edit member name or roles!",
           });
         }
         db.doc("members/" + req.body.email)
@@ -127,6 +127,20 @@ export let updateMember = async (req: Request, res: Response) => {
   }
 };
 
+export let getMember = async (req: Request, res: Response) => {
+  if(checkLoggedIn(req, res)) {
+    let member = await (
+      await db.doc('members/' + req.session.email).get()
+    ).data();
+    if(!member) {
+      res
+        .status(200)
+        .json({ error: "No member with email: " + req.session.email });
+    }
+    res.json({ member: member })
+  }
+}
+
 export let deleteMember = async (req, res) => {
   if (checkLoggedIn(req, res)) {
     let member = await (
@@ -135,7 +149,7 @@ export let deleteMember = async (req, res) => {
     if (!member) {
       res
         .status(200)
-        .json({ error: "Not member with email: " + req.session.email });
+        .json({ error: "No member with email: " + req.session.email });
     } else {
       let canEdit = PermissionsManager.canEditMembers(member.role);
       if (!canEdit) {
