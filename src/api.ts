@@ -6,7 +6,7 @@ import session, { MemoryStore } from "express-session";
 import { db as database, app as adminApp } from "./firebase";
 import bodyParser from "body-parser";
 import admin from "firebase-admin";
-import { allMembers, setMember, deleteMember, updateMember } from "./memberAPI";
+import { allMembers, getMember, setMember, deleteMember, updateMember } from "./memberAPI";
 import { getAllRoles } from "./roleAPI";
 import { allTeams, setTeam, deleteTeam } from "./teamAPI";
 
@@ -108,6 +108,7 @@ router.get("/allRoles", getAllRoles);
 
 // Members
 router.get("/allMembers", allMembers);
+router.get('./getMember', getMember)
 router.post("/setMember", setMember);
 router.post("/deleteMember", deleteMember);
 router.post("/updateMember", updateMember);
