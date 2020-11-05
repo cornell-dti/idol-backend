@@ -114,7 +114,7 @@ router.get('/allRoles', getAllRoles);
 
 // Members
 router.get('/allMembers', allMembers);
-router.post('/getMember/:email', getMember);
+router.get('/getMember/:email', getMember);
 router.post('/setMember', setMember);
 router.post('/deleteMember', deleteMember);
 router.post('/updateMember', updateMember);
