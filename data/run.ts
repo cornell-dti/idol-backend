@@ -1,12 +1,21 @@
-import { db } from "./firebase";
+import { db } from './firebase';
 
-const dirPath: string = "./members/";
-const filesPath: string = "./data/members/";
-const fs = require("fs");
+const removeEmptyOrNull = (obj) => {
+  Object.keys(obj).forEach(
+    (k) =>
+      (obj[k] && typeof obj[k] === 'object' && removeEmptyOrNull(obj[k])) ||
+      (!obj[k] && obj[k] !== undefined && delete obj[k])
+  );
+  return obj;
+};
+
+const dirPath: string = './members/';
+const filesPath: string = './data/members/';
+const fs = require('fs');
 const jsonFilesList: string[] = fs.readdirSync(filesPath);
-const emailDomain: string = "@cornell.edu";
+const emailDomain: string = '@cornell.edu';
 
-db.collection("members")
+db.collection('members')
   .get()
   .then((vals) => {
     return vals.docs.map((doc) => {
@@ -18,7 +27,7 @@ db.collection("members")
       let jsonData = require(dirPath + fileName);
       const email: string = jsonData.netid + emailDomain;
 
-      const data = {
+      let data = {
         first_name: jsonData.firstName,
         last_name: jsonData.lastName,
         email: email,
@@ -35,11 +44,14 @@ db.collection("members")
         other_subteams: jsonData.otherSubteams,
         website: jsonData.website,
       };
+
+      removeEmptyOrNull(data);
+
       if (data.website) {
         if (existingEmails.includes(email)) {
-          db.doc("members/" + email).update(data);
+          db.doc('members/' + email).update(data);
         } else {
-          db.doc("members/" + email).set(data);
+          db.doc('members/' + email).set(data);
         }
       }
     });
