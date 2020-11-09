@@ -117,7 +117,10 @@ router.get('/allMembers', allMembers);
 router.get('/getMember/:email', getMember);
 router.post('/setMember', setMember);
 router.post('/deleteMember', deleteMember);
-router.post('/updateMember', updateMember);
+router.post('/updateMember', async (req, res) => {
+  let handled = await updateMember(req, res);
+  res.status(handled.status).json(handled);
+});
 
 // Teams
 router.get('/allTeams', allTeams);

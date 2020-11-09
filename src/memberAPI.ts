@@ -2,24 +2,8 @@ import { checkLoggedIn } from './api';
 import { db } from './firebase';
 import { PermissionsManager } from './permissions';
 import { Request, Response } from 'express';
-
-export type Member = {
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  graduation: string;
-  major: string;
-  double_major?: string; //optional
-  minor?: string; //optional
-  website?: string; //optional
-  linkedin_link?: string; //optional
-  github_link?: string; //optional
-  hometown: string;
-  about: string;
-  subteam: string;
-  other_subteams?: string[]; // optional
-};
+import { ErrorResponse, MemberResponse } from './APITypes';
+import { Member } from './DataTypes';
 
 export let allMembers = async (req, res) => {
   if (checkLoggedIn(req, res)) {
@@ -43,12 +27,12 @@ export let setMember = async (req, res) => {
     ).data();
     if (!member) {
       res
-        .status(200)
+        .status(401)
         .json({ error: 'No member with email: ' + req.session.email });
     } else {
       let canEdit = PermissionsManager.canEditMembers(member.role);
       if (!canEdit) {
-        res.status(200).json({
+        res.status(403).json({
           error:
             'User with email: ' +
             req.session.email +
@@ -57,7 +41,7 @@ export let setMember = async (req, res) => {
       } else {
         if (!req.body.email || req.body.email === '') {
           res
-            .status(200)
+            .status(400)
             .json({ error: "Couldn't edit user with undefined email!" });
           return;
         }
@@ -68,7 +52,7 @@ export let setMember = async (req, res) => {
           })
           .catch((reason) => {
             res
-              .status(200)
+              .status(500)
               .json({ error: "Couldn't edit user for reason: " + reason });
           });
       }
@@ -76,57 +60,124 @@ export let setMember = async (req, res) => {
   }
 };
 
-export let updateMember = async (req: Request, res: Response) => {
+export let updateMember = async (
+  req: Request,
+  res: Response
+): Promise<MemberResponse | ErrorResponse> => {
   if (checkLoggedIn(req, res)) {
     let member = await (
       await db.doc('members/' + req.session.email).get()
     ).data();
     if (!member) {
-      res
-        .status(200)
-        .json({ error: 'No member with email: ' + req.session.email });
+      return {
+        error: 'No member with email: ' + req.session.email,
+        status: 401,
+      };
     } else {
-      let canEdit = PermissionsManager.canEditMembers(member.role);
+      let canEdit: boolean = PermissionsManager.canEditMembers(member.role);
       if (!canEdit && member.email !== req.body.email) {
-        // members are able to edit their own information
-        res.status(200).json({
+        return {
           error:
             'User with email: ' +
             req.session.email +
             ' does not have permission to edit members!',
-        });
+          status: 403,
+        };
       } else {
         if (!req.body.email || req.body.email === '') {
-          res
-            .status(200)
-            .json({ error: "Couldn't edit user with undefined email!" });
-          return;
+          return {
+            error: "Couldn't edit user with undefined email!",
+            status: 400,
+          };
         }
         if (
           (req.body.role || req.body.first_name || req.body.last_name) &&
           !canEdit
         ) {
-          res.status(200).json({
+          return {
+            status: 403,
             error:
               'User with email: ' +
               req.session.email +
               ' does not have permission to edit member name or roles!',
-          });
+          };
         }
-        db.doc('members/' + req.body.email)
+        let response: ErrorResponse | MemberResponse = await db
+          .doc('members/' + req.body.email)
           .update(req.body)
           .then(() => {
-            res.status(200).json({ status: 'Success', member: req.body });
+            return {
+              member: req.body as Member,
+              status: 200,
+            };
           })
           .catch((reason) => {
-            res
-              .status(200)
-              .json({ error: "Couldn't edit user for reason: " + reason });
+            return {
+              error: "Couldn't edit user for reason: " + reason,
+              status: 500,
+            };
           });
+
+        return response;
       }
     }
   }
 };
+
+// export let updateMember = async (
+//   req: Request,
+//   res: Response
+// ): Promise<UpdateMemberResponse | ErrorResponse> => {
+//   if (checkLoggedIn(req, res)) {
+//     let member = await (
+//       await db.doc('members/' + req.session.email).get()
+//     ).data();
+//     if (!member) {
+//       res
+//         .status(401)
+//         .json({ error: 'No member with email: ' + req.session.email });
+//     } else {
+//       let canEdit = PermissionsManager.canEditMembers(member.role);
+//       if (!canEdit && member.email !== req.body.email) {
+//         // members are able to edit their own information
+//         res.status(403).json({
+//           error:
+//             'User with email: ' +
+//             req.session.email +
+//             ' does not have permission to edit members!',
+//         });
+//       } else {
+//         if (!req.body.email || req.body.email === '') {
+//           res
+//             .status(400)
+//             .json({ error: "Couldn't edit user with undefined email!" });
+//           return;
+//         }
+//         if (
+//           (req.body.role || req.body.first_name || req.body.last_name) &&
+//           !canEdit
+//         ) {
+//           res.status(403).json({
+//             error:
+//               'User with email: ' +
+//               req.session.email +
+//               ' does not have permission to edit member name or roles!',
+//           });
+//         }
+//         db.doc('members/' + req.body.email)
+//           .update(req.body)
+//           .then(() => {
+//             res.status(200).json({ status: 'Success', member: req.body });
+//           })
+//           .catch((reason) => {
+//             res
+//               .status(500)
+//               .json({ error: "Couldn't edit user for reason: " + reason });
+//           });
+//       }
+//     }
+//   }
+// };
 
 export let getMember = async (req: Request, res: Response) => {
   console.log(req.session.email);
@@ -136,15 +187,14 @@ export let getMember = async (req: Request, res: Response) => {
     ).data();
     console.log(member);
     if (!member) {
-      res // TODO: change the response status code
-        .status(200)
+      res
+        .status(401)
         .json({ error: 'No member with email:' + req.session.email });
     } else {
       let canEdit: boolean = PermissionsManager.canEditMembers(member.role);
       let memberEmail: string = req.params.email;
       if (!canEdit && memberEmail !== req.session.email) {
-        // TODO: change the response status code
-        res.status(200).json({
+        res.status(403).json({
           error:
             'User with email: ' +
             req.session.email +
@@ -165,12 +215,12 @@ export let deleteMember = async (req, res) => {
     ).data();
     if (!member) {
       res
-        .status(200)
+        .status(401)
         .json({ error: 'No member with email: ' + req.session.email });
     } else {
       let canEdit = PermissionsManager.canEditMembers(member.role);
       if (!canEdit) {
-        res.status(200).json({
+        res.status(403).json({
           error:
             'User with email: ' +
             req.session.email +
