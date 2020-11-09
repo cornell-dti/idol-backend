@@ -1,5 +1,7 @@
 import { firestore } from 'firebase-admin';
 
+type role = 'lead' | 'admin' | 'tpm' | 'pm' | 'developer' | 'designer';
+
 type Member = {
   email: string;
   first_name: string;
