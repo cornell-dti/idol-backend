@@ -119,7 +119,12 @@ router.get('/getMember/:email', async (req, res) => {
   let handled = await getMember(req, res);
   res.status(handled.status).json(handled);
 });
-router.post('/setMember', setMember);
+
+router.post('/setMember', async (req, res) => {
+  let handled = await setMember(req, res);
+  res.status(handled.status).json(handled);
+});
+
 router.post('/deleteMember', deleteMember);
 
 router.post('/updateMember', async (req, res) => {
