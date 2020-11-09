@@ -23,7 +23,7 @@ const db = database;
 const PORT = process.env.PORT || 9000;
 const isProd: boolean = JSON.parse(process.env.IS_PROD);
 const allowAllOrigins = false;
-const enforceSession = true;
+const enforceSession = false;
 const allowedOrigins = allowAllOrigins
   ? [/.*/]
   : isProd
@@ -113,7 +113,10 @@ router.post('/logout', (req, res) => {
 router.get('/allRoles', getAllRoles);
 
 // Members
-router.get('/allMembers', allMembers);
+router.get('/allMembers', async (req, res) => {
+  let handled = await allMembers(req, res);
+  res.status(handled.status).json(handled);
+});
 
 router.get('/getMember/:email', async (req, res) => {
   let handled = await getMember(req, res);
@@ -125,7 +128,10 @@ router.post('/setMember', async (req, res) => {
   res.status(handled.status).json(handled);
 });
 
-router.post('/deleteMember', deleteMember);
+router.post('/deleteMember', async (req, res) => {
+  let handled = await deleteMember(req, res);
+  res.status(handled.status).json(handled);
+});
 
 router.post('/updateMember', async (req, res) => {
   let handled = await updateMember(req, res);

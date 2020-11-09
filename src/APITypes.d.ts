@@ -9,3 +9,8 @@ type MemberResponse = {
   status: number;
   member: Member;
 };
+
+type AllMembersResponse = {
+  status: number;
+  members: Member[];
+};
