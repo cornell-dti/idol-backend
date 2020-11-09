@@ -124,86 +124,39 @@ export let updateMember = async (
   }
 };
 
-// export let updateMember = async (
-//   req: Request,
-//   res: Response
-// ): Promise<UpdateMemberResponse | ErrorResponse> => {
-//   if (checkLoggedIn(req, res)) {
-//     let member = await (
-//       await db.doc('members/' + req.session.email).get()
-//     ).data();
-//     if (!member) {
-//       res
-//         .status(401)
-//         .json({ error: 'No member with email: ' + req.session.email });
-//     } else {
-//       let canEdit = PermissionsManager.canEditMembers(member.role);
-//       if (!canEdit && member.email !== req.body.email) {
-//         // members are able to edit their own information
-//         res.status(403).json({
-//           error:
-//             'User with email: ' +
-//             req.session.email +
-//             ' does not have permission to edit members!',
-//         });
-//       } else {
-//         if (!req.body.email || req.body.email === '') {
-//           res
-//             .status(400)
-//             .json({ error: "Couldn't edit user with undefined email!" });
-//           return;
-//         }
-//         if (
-//           (req.body.role || req.body.first_name || req.body.last_name) &&
-//           !canEdit
-//         ) {
-//           res.status(403).json({
-//             error:
-//               'User with email: ' +
-//               req.session.email +
-//               ' does not have permission to edit member name or roles!',
-//           });
-//         }
-//         db.doc('members/' + req.body.email)
-//           .update(req.body)
-//           .then(() => {
-//             res.status(200).json({ status: 'Success', member: req.body });
-//           })
-//           .catch((reason) => {
-//             res
-//               .status(500)
-//               .json({ error: "Couldn't edit user for reason: " + reason });
-//           });
-//       }
-//     }
-//   }
-// };
-
-export let getMember = async (req: Request, res: Response) => {
+export let getMember = async (
+  req: Request,
+  res: Response
+): Promise<MemberResponse | ErrorResponse> => {
   console.log(req.session.email);
   if (checkLoggedIn(req, res)) {
     let member = await (
       await db.doc('members/' + req.session.email).get()
     ).data();
-    console.log(member);
     if (!member) {
-      res
-        .status(401)
-        .json({ error: 'No member with email:' + req.session.email });
+      return {
+        error: 'No member with email: ' + req.session.email,
+        status: 401,
+      };
     } else {
       let canEdit: boolean = PermissionsManager.canEditMembers(member.role);
       let memberEmail: string = req.params.email;
       if (!canEdit && memberEmail !== req.session.email) {
-        res.status(403).json({
+        return {
           error:
             'User with email: ' +
             req.session.email +
             ' does not have permission to edit members!',
-        });
+          status: 403,
+        };
       }
-      res.status(200).json({
-        member: await (await db.doc('members/' + memberEmail).get()).data(),
-      });
+
+      return {
+        member: (await (
+          await db.doc('members' + memberEmail).get()
+        ).data()) as Member,
+        status: 200,
+      };
     }
   }
 };
