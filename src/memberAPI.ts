@@ -132,7 +132,6 @@ export let getMember = async (
   req: Request,
   res: Response
 ): Promise<MemberResponse | ErrorResponse> => {
-  console.log(req.session.email);
   if (checkLoggedIn(req, res)) {
     let member = await (
       await db.doc('members/' + req.session.email).get()
