@@ -4,34 +4,26 @@ import { PermissionsManager } from "./permissions";
 import { checkLoggedIn } from "./api";
 import { firestore } from "firebase-admin";
 import { materialize } from "./util";
-import { Member } from "./memberAPI";
+import { Member, Team, DBTeam } from "./DataTypes";
 import { v4 as uuidv4 } from "uuid";
+import { Request, Response } from 'express';
+import { ErrorResponse, TeamResponse, AllTeamsResponse } from './APITypes';
 
-export type DBTeam = {
-  uuid: string;
-  name: string;
-  leaders: firestore.DocumentReference[];
-  members: firestore.DocumentReference[];
-};
-
-export type Team = {
-  uuid: string;
-  name: string;
-  leaders: Member[];
-  members: Member[];
-};
-
-export let allTeams = async (req, res) => {
+export let allTeams = async function (req: Request, res: Response): Promise<AllTeamsResponse | ErrorResponse> {
   if (checkLoggedIn(req, res)) {
     let teamRefs = await db.collection("teams").get();
     let resp = await Promise.all(
       teamRefs.docs.map((teamRef) => materialize(teamRef.data()))
     );
-    res.json({ teams: resp });
+    return {
+      status: 200,
+      teams: resp
+    };
+    //res.json({ teams: resp });
   }
 };
 
-export let setTeam = async (req, res) => {
+export let setTeam = async function (req: Request, res: Response): Promise<TeamResponse | ErrorResponse> {
   if (checkLoggedIn(req, res)) {
     let teamBody = req.body as Team;
     let member = await (
@@ -39,20 +31,22 @@ export let setTeam = async (req, res) => {
     ).data();
     let canEdit = PermissionsManager.canEditTeams(member.role);
     if (!canEdit) {
-      res.status(200).json({
-        error:
-          "User with email: " +
-          req.session.email +
-          " does not have permission to edit teams!",
-      });
+      return {
+        status: 403,
+        error: "User with email: " + req.session.email + " does not have permission to edit teams!",
+      };
     } else {
       if (teamBody.leaders.length > 0 && !teamBody.leaders[0].email) {
-        res.status(200).json({ error: "Malformed leaders on POST!" });
-        return;
+        return {
+          status: 400,
+          error: "Malformed leaders on POST!"
+        };
       }
       if (teamBody.members.length > 0 && !teamBody.members[0].email) {
-        res.status(200).json({ error: "Malformed members on POST!" });
-        return;
+        return {
+          status: 400,
+          error: "Malformed members on POST!"
+        };
       }
       let teamRef: DBTeam = {
         uuid: teamBody.uuid ? teamBody.uuid : uuidv4(),
@@ -68,62 +62,69 @@ export let setTeam = async (req, res) => {
           .map((ref) => ref.get().then((val) => val.exists))
       );
       if (existRes.findIndex((val) => val === false) != -1) {
-        res.status(200).json({
-          error: "Couldn't create team from members that don't exist!",
-        });
+        return {
+          status: 404,
+          error: "Couldn't create team from members that don't exist!"
+        };
       } else {
         db.doc("teams/" + teamRef.uuid)
           .set(teamRef)
           .then(() => {
-            res.status(200).json({
-              status: "Success",
-              team: { ...teamBody, uuid: teamRef.uuid },
-            });
+            return {
+              status: 200,
+              team: { ...teamBody, uuid: teamRef.uuid }
+            };
           })
           .catch((reason) => {
-            res
-              .status(200)
-              .json({ error: "Couldn't edit team for reason: " + reason });
+            return {
+              status: 500,
+              error: "Couldn't edit team for reason: " + reason
+            };
           });
       }
     }
   }
 };
 
-export let deleteTeam = async (req, res) => {
+export let deleteTeam = async function (req: Request, res: Response): Promise<TeamResponse | ErrorResponse> {
   if (checkLoggedIn(req, res)) {
     let teamBody = req.body as Team;
     if (!teamBody.uuid || teamBody.uuid === "") {
-      res
-        .status(200)
-        .json({ error: "Couldn't delete team with undefined uuid!" });
-      return;
+      return {
+        status: 400,
+        error: "Couldn't delete team with undefined uuid!"
+      };
     }
     let member = await (
       await db.doc("members/" + req.session.email).get()
     ).data();
     let teamSnap = await await db.doc("teams/" + teamBody.uuid).get();
     if (!teamSnap.exists) {
-      res.status(200).json({ error: "No team with uuid: " + teamBody.uuid });
+      return {
+        status: 404,
+        error: "No team with uuid: " + teamBody.uuid
+      };
     } else {
       let canEdit = PermissionsManager.canEditTeams(member.role);
       if (!canEdit) {
-        res.status(200).json({
-          error:
-            "User with email: " +
-            req.session.email +
-            " does not have permission to delete teams!",
-        });
+        return {
+          status: 403,
+          error: "User with email: " + req.session.email + " does not have permission to delete teams!"
+        };
       } else {
         db.doc("teams/" + teamBody.uuid)
           .delete()
           .then(() => {
-            res.status(200).json({ status: "Success", team: teamBody });
+            return {
+              status: 200,
+              team: teamBody
+            }
           })
           .catch((reason) => {
-            res
-              .status(200)
-              .json({ error: "Couldn't delete team for reason: " + reason });
+            return {
+              status: 500,
+              error: "Couldn't delete team for reason: " + reason
+            };
           });
       }
     }
