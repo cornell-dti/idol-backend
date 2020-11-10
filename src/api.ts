@@ -128,7 +128,7 @@ router.post('/setMember', async (req, res) => {
   res.status(handled.status).json(handled);
 });
 
-router.post('/deleteMember', async (req, res) => {
+router.delete('/deleteMember', async (req, res) => {
   let handled = await deleteMember(req, res);
   res.status(handled.status).json(handled);
 });
@@ -141,7 +141,7 @@ router.post('/updateMember', async (req, res) => {
 // Teams
 router.get('/allTeams', allTeams);
 router.post('/setTeam', setTeam);
-router.post('/deleteTeam', deleteTeam);
+router.delete('/deleteTeam', deleteTeam);
 
 app.use('/.netlify/functions/api', router);
 
