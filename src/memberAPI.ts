@@ -128,7 +128,7 @@ export let getMember = async function (req: Request, res: Response): Promise<Mem
       if (!canEdit && memberEmail !== req.session.email) {
         return {
           status: 403,
-          error: 'User with email: ' + req.session.email + ' does not have permission to edit members!'
+          error: 'User with email: ' + req.session.email + ' does not have permission to get members!'
         };
       }
       let getmember: Member = (await db.doc('members/' + memberEmail).get()).data() as Member;
@@ -155,7 +155,7 @@ export let deleteMember = async function (req: Request, res: Response): Promise<
       if (!canEdit) {
         return {
           status: 403,
-          error: 'User with email: ' + req.session.email + ' does not have permission to edit members!'
+          error: 'User with email: ' + req.session.email + ' does not have permission to delete members!'
         };
       }
     }
