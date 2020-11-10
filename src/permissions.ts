@@ -1,4 +1,5 @@
-export type role = "lead" | "admin" | "tpm" | "pm" | "developer" | "designer";
+import { role } from "./DataTypes"
+
 export const allRoles: role[] = [
   "lead",
   "admin",
