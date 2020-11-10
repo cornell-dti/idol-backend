@@ -27,8 +27,8 @@ const enforceSession = true;
 const allowedOrigins = allowAllOrigins
   ? [/.*/]
   : isProd
-  ? [/https:\/\/idol\.cornelldti\.org/, /.*--cornelldti-idol\.netlify\.app/]
-  : [/http:\/\/localhost:3000/];
+    ? [/https:\/\/idol\.cornelldti\.org/, /.*--cornelldti-idol\.netlify\.app/]
+    : [/http:\/\/localhost:3000/];
 
 // Middleware
 app.use(
@@ -113,16 +113,33 @@ router.post('/logout', (req, res) => {
 router.get('/allRoles', getAllRoles);
 
 // Members
-router.get('/allMembers', allMembers);
-router.get('/getMember/:email', getMember);
-router.post('/setMember', setMember);
-router.post('/deleteMember', deleteMember);
-router.post('/updateMember', updateMember);
+router.get('/allMembers', async (req, res) => {
+  let handled = await allMembers(req, res); res.status(handled.status).json(handled);
+});
+router.get('/getMember/:email', async (req, res) => {
+  let handled = await getMember(req, res); res.status(handled.status).json(handled);
+});
+router.post('/setMember', async (req, res) => {
+  let handled = await setMember(req, res); res.status(handled.status).json(handled);
+});
+router.post('/deleteMember', async (req, res) => {
+  let handled = await deleteMember(req, res); res.status(handled.status).json(handled);
+});
+router.post("/updateMember", async (req, res) => {
+  let handled = await updateMember(req, res); res.status(handled.status).json(handled);
+});
 
 // Teams
-router.get('/allTeams', allTeams);
-router.post('/setTeam', setTeam);
-router.post('/deleteTeam', deleteTeam);
+//router.get('/allTeams', allTeams);
+router.get('/allTeams', async (req, res) => {
+  let handled = await allTeams(req, res); res.status(handled.status).json(handled);
+});
+router.post('/setTeam', async (req, res) => {
+  let handled = await setTeam(req, res); res.status(handled.status).json(handled);
+});
+router.post('/deleteTeam', async (req, res) => {
+  let handled = await deleteTeam(req, res); res.status(handled.status).json(handled);
+});
 
 app.use('/.netlify/functions/api', router);
 
