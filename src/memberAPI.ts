@@ -133,16 +133,15 @@ export let getMember = async (
   res: Response
 ): Promise<MemberResponse | ErrorResponse> => {
   if (checkLoggedIn(req, res)) {
-    let member = await (
-      await db.doc('members/' + req.session.email).get()
-    ).data();
-    if (!member) {
+    let user = await (await db.doc('members/' + req.session.email).get()
+      .data();
+    if (!user) {
       return {
         error: 'No member with email: ' + req.session.email,
         status: 401,
       };
     } else {
-      let canEdit: boolean = PermissionsManager.canEditMembers(member.role);
+      let canEdit: boolean = PermissionsManager.canEditMembers(user.role);
       let memberEmail: string = req.params.email;
       if (!canEdit && memberEmail !== req.session.email) {
         return {
@@ -153,10 +152,16 @@ export let getMember = async (
           status: 403,
         };
       }
-
+      let member = await (await db.doc('members/' + memberEmail).get()).data();
+      if (!member) {
+        return {
+          status: 404,
+          error: 'Member with email: ' + memberEmail + ' does not exist',
+        };
+      }
       return {
         member: (await (
-          await db.doc('members' + memberEmail).get()
+          await db.doc('members/' + memberEmail).get()
         ).data()) as Member,
         status: 200,
       };
