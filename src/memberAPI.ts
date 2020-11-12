@@ -161,9 +161,7 @@ export let getMember = async (
         };
       }
       return {
-        member: (await (
-          await db.doc('members/' + memberEmail).get()
-        ).data()) as Member,
+        member: member as Member,
         status: 200,
       };
     }
