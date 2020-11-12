@@ -133,8 +133,9 @@ export let getMember = async (
   res: Response
 ): Promise<MemberResponse | ErrorResponse> => {
   if (checkLoggedIn(req, res)) {
-    let user = await (await db.doc('members/' + req.session.email).get()
-      .data();
+    let user = await (
+      await db.doc('members/' + req.session.email).get()
+    ).data();
     if (!user) {
       return {
         error: 'No member with email: ' + req.session.email,
