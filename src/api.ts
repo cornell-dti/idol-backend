@@ -114,31 +114,37 @@ router.get('/allRoles', getAllRoles);
 
 // Members
 router.get('/allMembers', async (req, res) => {
-  let handled = await allMembers(req, res); res.status(handled.status).json(handled);
+  let handled = await allMembers(req, res);
+  res.status(handled.status).json(handled);
 });
 router.get('/getMember/:email', async (req, res) => {
-  let handled = await getMember(req, res); res.status(handled.status).json(handled);
+  let handled = await getMember(req, res);
+  res.status(handled.status).json(handled);
 });
 router.post('/setMember', async (req, res) => {
-  let handled = await setMember(req, res); res.status(handled.status).json(handled);
+  let handled = await setMember(req, res);
+  res.status(handled.status).json(handled);
 });
-router.post('/deleteMember', async (req, res) => {
-  let handled = await deleteMember(req, res); res.status(handled.status).json(handled);
+router.delete('/deleteMember', async (req, res) => {
+  let handled = await deleteMember(req, res);
+  res.status(handled.status).json(handled);
 });
 router.post("/updateMember", async (req, res) => {
-  let handled = await updateMember(req, res); res.status(handled.status).json(handled);
+  let handled = await updateMember(req, res);
+  res.status(handled.status).json(handled);
 });
 
 // Teams
-//router.get('/allTeams', allTeams);
 router.get('/allTeams', async (req, res) => {
   let handled = await allTeams(req, res); res.status(handled.status).json(handled);
 });
 router.post('/setTeam', async (req, res) => {
-  let handled = await setTeam(req, res); res.status(handled.status).json(handled);
+  let handled = await setTeam(req, res);
+  res.status(handled.status).json(handled);
 });
-router.post('/deleteTeam', async (req, res) => {
-  let handled = await deleteTeam(req, res); res.status(handled.status).json(handled);
+router.delete('/deleteTeam', async (req, res) => {
+  let handled = await deleteTeam(req, res);
+  res.status(handled.status).json(handled);
 });
 
 app.use('/.netlify/functions/api', router);
