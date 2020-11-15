@@ -187,7 +187,29 @@ export let deleteMember = async function (req: Request, res: Response): Promise<
           status: 403,
           error: 'User with email: ' + req.session.email + ' does not have permission to delete members!'
         };
+      } else {
+        if (!req.body.email || req.body.email === '') {
+          return {
+            status: 400,
+            error: "Couldn't delete user with undefined email!"
+          };
+        }
+        let response: MemberResponse | ErrorResponse = await db.doc('members/' + req.body.email)
+          .delete()
+          .then(() => {
+            return {
+              status: 200,
+              member: req.body
+            };
+          })
+          .catch((reason) => {
+            return {
+              status: 500,
+              error: "Couldn't delete user for reason: " + reason
+            };
+          });
+        return response;
       }
     }
   }
-};
+}
