@@ -41,7 +41,7 @@ export let setMember = async function (req: Request, res: Response): Promise<Mem
             error: "Couldn't edit user with undefined email!"
           };
         }
-        db.doc('members/' + req.body.email)
+        let response: MemberResponse | ErrorResponse = await db.doc('members/' + req.body.email)
           .set(req.body)
           .then(() => {
             return {
@@ -55,6 +55,7 @@ export let setMember = async function (req: Request, res: Response): Promise<Mem
               error: "Couldn't edit user for reason: " + reason
             };
           });
+        return response;
       }
     }
   }
@@ -92,8 +93,7 @@ export let updateMember = async function (req: Request, res: Response): Promise<
             error: 'User with email: ' + req.session.email + ' does not have permission to edit member name or roles!',
           };
         }
-        //let response: MemberResponse | ErrorResponse = 
-        db.doc('members/' + req.body.email)
+        let response: MemberResponse | ErrorResponse = await db.doc('members/' + req.body.email)
           .update(req.body)
           .then(() => {
             return {
@@ -107,7 +107,7 @@ export let updateMember = async function (req: Request, res: Response): Promise<
               error: "Couldn't edit user for reason: " + reason
             };
           });
-        //return response;
+        return response;
       }
     }
   }
@@ -131,10 +131,41 @@ export let getMember = async function (req: Request, res: Response): Promise<Mem
           error: 'User with email: ' + req.session.email + ' does not have permission to get members!'
         };
       }
-      return {
-        status: 200,
-        member: member as Member
-      };
+      let response: MemberResponse | ErrorResponse = await db.doc('members/' + req.params.email)
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            return {
+              status: 200,
+              member: doc.data() as Member
+            };
+          }
+          else {
+            return {
+              status: 404,
+              error: 'No member with email: ' + req.params.email
+            };
+          }
+        })
+        .catch((reason) => {
+          return {
+            status: 500,
+            error: "Couldn't edit user for reason: " + reason
+          };
+        });
+      return response;
+
+      // let mem: Member = await (await db.doc('members/' + req.session.email).get()).data() as Member;
+      // if (!mem) {
+      //   return {
+      //     status: 404,
+      //     error: "not found"
+      //   };
+      // }
+      // return {
+      //   status: 200,
+      //   member: mem
+      // };
     }
   }
 };
