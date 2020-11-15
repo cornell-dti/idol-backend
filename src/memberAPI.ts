@@ -24,7 +24,7 @@ export let setMember = async function (req: Request, res: Response): Promise<Mem
     ).data();
     if (!user) {
       return {
-        status: 404,
+        status: 401,
         error: 'No user with email: ' + req.session.email
       };
     } else {
@@ -68,7 +68,7 @@ export let updateMember = async function (req: Request, res: Response): Promise<
     ).data();
     if (!user) {
       return {
-        status: 404,
+        status: 401,
         error: 'No user with email: ' + req.session.email
       };
     } else {
@@ -126,7 +126,7 @@ export let getMember = async function (req: Request, res: Response): Promise<Mem
     console.log(user);
     if (!user) {
       return {
-        status: 404,
+        status: 401,
         error: 'No user with email:' + req.session.email
       };
     } else {
@@ -161,18 +161,6 @@ export let getMember = async function (req: Request, res: Response): Promise<Mem
           };
         });
       return response;
-
-      // let mem: Member = await (await db.doc('members/' + req.session.email).get()).data() as Member;
-      // if (!mem) {
-      //   return {
-      //     status: 404,
-      //     error: "not found"
-      //   };
-      // }
-      // return {
-      //   status: 200,
-      //   member: mem
-      // };
     }
   }
 };
@@ -184,7 +172,7 @@ export let deleteMember = async function (req: Request, res: Response): Promise<
     ).data();
     if (!user) {
       return {
-        status: 404,
+        status: 401,
         error: 'No user with email: ' + req.session.email
       };
     } else {

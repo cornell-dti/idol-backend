@@ -136,7 +136,8 @@ router.post("/updateMember", async (req, res) => {
 
 // Teams
 router.get('/allTeams', async (req, res) => {
-  let handled = await allTeams(req, res); res.status(handled.status).json(handled);
+  let handled = await allTeams(req, res);
+  res.status(handled.status).json(handled);
 });
 router.post('/setTeam', async (req, res) => {
   let handled = await setTeam(req, res);
