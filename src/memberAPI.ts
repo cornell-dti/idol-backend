@@ -92,6 +92,7 @@ export let updateMember = async function (req: Request, res: Response): Promise<
             error: 'User with email: ' + req.session.email + ' does not have permission to edit member name or roles!',
           };
         }
+        //let response: MemberResponse | ErrorResponse = 
         db.doc('members/' + req.body.email)
           .update(req.body)
           .then(() => {
@@ -106,6 +107,7 @@ export let updateMember = async function (req: Request, res: Response): Promise<
               error: "Couldn't edit user for reason: " + reason
             };
           });
+        //return response;
       }
     }
   }
@@ -113,9 +115,7 @@ export let updateMember = async function (req: Request, res: Response): Promise<
 
 export let getMember = async function (req: Request, res: Response): Promise<MemberResponse | ErrorResponse> {
   if (checkLoggedIn(req, res)) {
-    let member = await (
-      await db.doc('members/' + req.session.email).get()
-    ).data();
+    let member = await (await db.doc('members/' + req.session.email).get()).data();
     console.log(member);
     if (!member) {
       return {
@@ -131,10 +131,9 @@ export let getMember = async function (req: Request, res: Response): Promise<Mem
           error: 'User with email: ' + req.session.email + ' does not have permission to get members!'
         };
       }
-      let getmember: Member = (await db.doc('members/' + memberEmail).get()).data() as Member;
       return {
         status: 200,
-        member: getmember
+        member: member as Member
       };
     }
   }

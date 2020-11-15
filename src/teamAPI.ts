@@ -19,7 +19,6 @@ export let allTeams = async function (req: Request, res: Response): Promise<AllT
       status: 200,
       teams: resp
     };
-    //res.json({ teams: resp });
   }
 };
 
