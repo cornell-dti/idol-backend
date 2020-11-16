@@ -48,7 +48,8 @@ export let setMember = async (
             status: 400,
           };
         }
-        db.doc('members/' + req.body.email)
+        let response: ErrorResponse | MemberResponse = await db
+          .doc('members/' + req.body.email)
           .set(req.body)
           .then(() => {
             return { status: 200, member: req.body };
@@ -59,6 +60,7 @@ export let setMember = async (
               status: 500,
             };
           });
+        return response;
       }
     }
   }
