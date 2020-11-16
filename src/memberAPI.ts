@@ -23,16 +23,16 @@ export let setMember = async (
   res
 ): Promise<MemberResponse | ErrorResponse> => {
   if (checkLoggedIn(req, res)) {
-    let member = await (
+    let user = await (
       await db.doc('members/' + req.session.email).get()
     ).data();
-    if (!member) {
+    if (!user) {
       return {
-        error: 'No member with email: ' + req.session.email,
+        error: 'No user with email: ' + req.session.email,
         status: 401,
       };
     } else {
-      let canEdit = PermissionsManager.canEditMembers(member.role);
+      let canEdit = PermissionsManager.canEditMembers(user.role);
       if (!canEdit) {
         return {
           error:
@@ -44,7 +44,7 @@ export let setMember = async (
       } else {
         if (!req.body.email || req.body.email === '') {
           return {
-            error: "Couldn't edit user with undefined email!",
+            error: "Couldn't edit member with undefined email!",
             status: 400,
           };
         }
@@ -56,7 +56,7 @@ export let setMember = async (
           })
           .catch((reason) => {
             return {
-              error: "Couldn't edit user for reason: " + reason,
+              error: "Couldn't edit member for reason: " + reason,
               status: 500,
             };
           });
@@ -71,17 +71,17 @@ export let updateMember = async (
   res: Response
 ): Promise<MemberResponse | ErrorResponse> => {
   if (checkLoggedIn(req, res)) {
-    let member = await (
+    let user = await (
       await db.doc('members/' + req.session.email).get()
     ).data();
-    if (!member) {
+    if (!user) {
       return {
-        error: 'No member with email: ' + req.session.email,
+        error: 'No user with email: ' + req.session.email,
         status: 401,
       };
     } else {
-      let canEdit: boolean = PermissionsManager.canEditMembers(member.role);
-      if (!canEdit && member.email !== req.body.email) {
+      let canEdit: boolean = PermissionsManager.canEditMembers(user.role);
+      if (!canEdit && user.email !== req.body.email) {
         return {
           error:
             'User with email: ' +
@@ -92,7 +92,7 @@ export let updateMember = async (
       } else {
         if (!req.body.email || req.body.email === '') {
           return {
-            error: "Couldn't edit user with undefined email!",
+            error: "Couldn't edit member with undefined email!",
             status: 400,
           };
         }
@@ -119,7 +119,7 @@ export let updateMember = async (
           })
           .catch((reason) => {
             return {
-              error: "Couldn't edit user for reason: " + reason,
+              error: "Couldn't edit member for reason: " + reason,
               status: 500,
             };
           });
@@ -140,7 +140,7 @@ export let getMember = async (
     ).data();
     if (!user) {
       return {
-        error: 'No member with email: ' + req.session.email,
+        error: 'No user with email: ' + req.session.email,
         status: 401,
       };
     } else {
@@ -175,16 +175,16 @@ export let deleteMember = async (
   res
 ): Promise<MemberResponse | ErrorResponse> => {
   if (checkLoggedIn(req, res)) {
-    let member = await (
+    let user = await (
       await db.doc('members/' + req.session.email).get()
     ).data();
-    if (!member) {
+    if (!user) {
       return {
-        error: 'No member with email: ' + req.session.email,
+        error: 'No user with email: ' + req.session.email,
         status: 401,
       };
     } else {
-      let canEdit = PermissionsManager.canEditMembers(member.role);
+      let canEdit = PermissionsManager.canEditMembers(user.role);
       if (!canEdit) {
         return {
           error:
@@ -196,7 +196,7 @@ export let deleteMember = async (
       } else {
         if (!req.body.email || req.body.email === '') {
           return {
-            error: "Couldn't delete user with undefined email!",
+            error: "Couldn't delete member with undefined email!",
             status: 400,
           };
         }
@@ -211,7 +211,7 @@ export let deleteMember = async (
           })
           .catch((reason) => {
             return {
-              error: "Couldn't delete user for reason: " + reason,
+              error: "Couldn't delete member for reason: " + reason,
               status: 500,
             };
           });
