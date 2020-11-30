@@ -7,8 +7,9 @@ let getNetId = (email: string): string => {
 
 const fs = require('fs');
 const dirPath: string = 'scripts/members/';
-const jsonFilesList: string[] = fs.readdirSync(dirPath);
+fs.mkdirSync(dirPath, { recursive: true });
 
+const jsonFilesList: string[] = fs.readdirSync(dirPath);
 jsonFilesList.forEach((json) =>
   fs.unlink(dirPath + json, (err) => {
     if (err) {
