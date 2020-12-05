@@ -1,0 +1,17 @@
+{
+    "netid": "jt568",
+    "firstName": "Jason",
+    "lastName": "Tung",
+    "name": "Jason Tung",
+    "graduation": "May 2023",
+    "major": "Computer Science",
+    "minor": "Applied Mathematics",
+    "website": "http://jasontung.me/",
+    "linkedin": "https://www.linkedin.com/in/jason-tung/",
+    "github": "https://github.com/jason-tung/",
+    "hometown": "NYC, NY",
+    "about": "Invite me to coffee to talk about philosophy!",
+    "subteam": "samwise",
+    "roleId": "developer",
+    "roleDescription": "Developer"
+}

@@ -1,5 +1,6 @@
-import admin from "firebase-admin";
-var serviceAccount = require("../resources/idol-b6c68-firebase-adminsdk-h4e6t-40e4bd5536.json");
+require("dotenv").config();
+import admin = require("./../node_modules/firebase-admin/lib");
+var serviceAccount = require("./../resources/idol-b6c68-firebase-adminsdk-h4e6t-40e4bd5536.json");
 
 let configureAccount = (sa) => {
   let configAcc = sa;
@@ -14,7 +15,7 @@ let configureAccount = (sa) => {
   return configAcc;
 };
 
-export const app = admin.initializeApp({
+const app = admin.initializeApp({
   credential: admin.credential.cert(configureAccount(serviceAccount)),
   databaseURL: "https://idol-b6c68.firebaseio.com",
 });
