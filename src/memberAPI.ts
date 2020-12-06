@@ -4,7 +4,7 @@ import { PermissionsManager } from './permissions';
 import { Request, Response } from 'express';
 import { ErrorResponse, MemberResponse, AllMembersResponse } from './APITypes';
 import { Member } from './DataTypes';
-import { readJsonConfigFile } from 'typescript';
+import { sendMessage } from './NovaAPI';
 
 export let allMembers = async (req, res): Promise<AllMembersResponse> => {
   if (checkLoggedIn(req, res)) {
@@ -112,10 +112,20 @@ export let updateMember = async (
           .doc('members/' + req.body.email)
           .update(req.body)
           .then(() => {
-            return {
-              member: req.body as Member,
-              status: 200,
-            };
+            let novaResponse = sendMessage({ member: req.body })
+              .then(() => {
+                return {
+                  member: req.body as Member,
+                  status: 200,
+                };
+              })
+              .catch(() => {
+                return {
+                  status: 500,
+                  error: 'There was an error updating member information',
+                };
+              });
+            return novaResponse;
           })
           .catch((reason) => {
             return {

@@ -6,4 +6,4 @@ functions/
 
 .env
 
-scripts/members/*
+nova-server/members/*
