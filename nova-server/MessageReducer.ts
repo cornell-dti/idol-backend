@@ -15,7 +15,6 @@ export let messageReducer = async (
   req: Request,
   res: Response
 ): Promise<MessageResponse> => {
-  console.log(req.body);
   let response;
   if (req.body.member) response = await updateMemberInfo(req.body.member);
   else if (req.body.image) response = await updateMemberImage(req.body.image);
@@ -25,7 +24,6 @@ export let messageReducer = async (
 let updateMemberInfo = async (
   member: Member
 ): Promise<MemberResponse | ErrorResponse> => {
-  console.log(member);
   let netId: string = getNetId(member.email);
   let data = JSON.stringify(member);
 
