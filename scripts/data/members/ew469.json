@@ -1,0 +1,21 @@
+{
+    "email": "ew469@cornell.edu",
+    "graduation": "December 2020",
+    "about": "I'm a junior in the College of Arts and Sciences majoring in Information Science. In my free time I love exploring all sorts of wild technologies. My adventures in Vue.js in fact led to this very site to use it. I've worked within frontend web, backend, and mobile spheres and enjoy periodically switching things up to get a better sense of new and especially emerging platforms. Outside of DTI I enjoy singing in Cornell Chorale, studying Latin, and experimenting with gluten-free recipes among other things.",
+    "other_subteams": [
+        "flux",
+        "shout",
+        "nova"
+    ],
+    "github_link": null,
+    "website": "https://www.evanwelsh.com",
+    "linkedin_link": null,
+    "subteam": "Leads",
+    "minor": "Computer Science",
+    "major": "Information Science",
+    "first_name": "Evan",
+    "role": "lead",
+    "hometown": "Grand Forks, ND",
+    "last_name": "Welsh",
+    "double_major": null
+}

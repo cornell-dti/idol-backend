@@ -1,0 +1,18 @@
+{
+    "role": "pm",
+    "first_name": "William",
+    "about": "Hey! I'm Will, a sophomore developer on DTI, and I love to spend my time coding and helping out the community. Besides DTI, I am involved with Girls Who Code on campus, where I help high-school students learn and appreciate the basics of programming. Besides developing, I spend my time gaming and following politics, so I can commonly be found yelling at my computer due to a broken controller or some scandalous news story.",
+    "graduation": "May 2022",
+    "major": "Computer Science",
+    "github_link": "https://github.com/willespencer",
+    "linkedin_link": "https://www.linkedin.com/in/willespencer/",
+    "other_subteams": [
+        "nova"
+    ],
+    "subteam": "courseplan",
+    "minor": "Public Policy",
+    "email": "wes229@cornell.edu",
+    "last_name": "Spencer",
+    "double_major": null,
+    "hometown": "Tyson's, VA"
+}
