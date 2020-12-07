@@ -1,7 +1,12 @@
 import { db } from './firebase';
+import express from 'express';
+import { reduceMessage } from "./MessageReducer"
+
+const server = express();
+const router = express.Router();
+const PORT = 9000;
 
 const dirPath: string = __dirname + '/data/members/';
-
 const fs = require('fs');
 
 let getFilePath = function (email: string): string {
@@ -10,16 +15,27 @@ let getFilePath = function (email: string): string {
     return path;
 }
 
-db.collection('members').get().then((vals) => {
-    vals.forEach((doc) => {
-        var data = doc.data();
-        var filePath = getFilePath(data.email);
-        fs.writeFile(getFilePath(data.email), JSON.stringify(data), function (err) {
-            if (err) {
-                console.log(err);
-            }
+let getMembers = function () {
+    db.collection('members').get().then((vals) => {
+        vals.forEach((doc) => {
+            var data = doc.data();
+            fs.writeFile(getFilePath(data.email), JSON.stringify(data), function (err) {
+                if (err) {
+                    console.log(err);
+                }
+            });
         });
-    });
-})
+    })
+}
+
+router.post('/api/message', async (req, res) => {
+    let handled = await reduceMessage(req, res);
+    res.status(handled.status).json(handled);
+});
+
+server.listen(PORT, () => {
+    console.log('IDOL scripts listening on port: ' + PORT);
+    getMembers();
+});
 
 
