@@ -33,6 +33,8 @@ router.post('/api/message', async (req, res) => {
     res.status(handled.status).json(handled);
 });
 
+server.use('/.netlify/functions/api', router);
+
 server.listen(PORT, () => {
     console.log('IDOL scripts listening on port: ' + PORT);
     getMembers();
