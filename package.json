@@ -6,7 +6,8 @@
   "scripts": {
     "start": "./node_modules/.bin/netlify-lambda serve build",
     "dev": "ts-node src/api.ts",
-    "functions": "tsc"
+    "functions": "tsc",
+    "nova": "ts-node nova/api.ts"
   },
   "author": "Jagger Brulato",
   "license": "ISC",
