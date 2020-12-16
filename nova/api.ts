@@ -1,20 +1,14 @@
 import { db } from './firebase';
 import express from 'express';
 import { Request, Response } from 'express';
-import { reduceMessage } from "./MessageReducer"
+import { reduceMessage } from './MessageReducer'
+import { getFilePath } from './utils'
 
 const server = express();
 const router = express.Router();
 const PORT = 9000;
 
-const dirPath: string = __dirname + '/static/memberJSON/';
 const fs = require('fs');
-
-let getFilePath = function (email: string): string {
-    var pos = email.indexOf('@');
-    var path = dirPath + email.slice(0, pos) + '.json';
-    return path;
-}
 
 let getMembers = function () {
     db.collection('members').get().then((vals) => {

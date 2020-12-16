@@ -2,15 +2,9 @@ import { db } from './firebase';
 import { Request, Response } from 'express';
 import { Member } from '../src/DataTypes';
 import { ErrorResponse, MemberResponse, ImageResponse } from '../src/APITypes';
+import { getFilePath } from './utils'
 
-const dirPath: string = __dirname + '/static/memberJSON/';
 const fs = require('fs');
-
-let getFilePath = function (email: string): string {
-    var pos = email.indexOf('@');
-    var path = dirPath + email.slice(0, pos) + '.json';
-    return path;
-}
 
 export let reduceMessage = async function (req: Request, res: Response): Promise<MemberResponse | ImageResponse | ErrorResponse> {
     if (!req.body.member) {
