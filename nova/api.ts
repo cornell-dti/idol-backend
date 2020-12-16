@@ -1,5 +1,6 @@
 import { db } from './firebase';
 import express from 'express';
+import { Request, Response } from 'express';
 import { reduceMessage } from "./MessageReducer"
 
 const server = express();
@@ -28,7 +29,7 @@ let getMembers = function () {
     })
 }
 
-router.post('/api/message', async (req, res) => {
+router.post('/api/message', async (req: Request, res: Response) => {
     let handled = await reduceMessage(req, res);
     res.status(handled.status).json(handled);
 });
