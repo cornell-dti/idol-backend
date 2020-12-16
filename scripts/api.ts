@@ -6,7 +6,7 @@ const server = express();
 const router = express.Router();
 const PORT = 9000;
 
-const dirPath: string = __dirname + '/data/members/';
+const dirPath: string = __dirname + '/static/memberJSON/';
 const fs = require('fs');
 
 let getFilePath = function (email: string): string {

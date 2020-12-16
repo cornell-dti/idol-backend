@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { Member } from '../src/DataTypes';
 import { ErrorResponse, MemberResponse, ImageResponse } from '../src/APITypes';
 
-const dirPath: string = __dirname + '/data/members/';
+const dirPath: string = __dirname + '/static/memberJSON/';
 const fs = require('fs');
 
 let getFilePath = function (email: string): string {
