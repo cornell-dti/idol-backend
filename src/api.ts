@@ -113,16 +113,35 @@ router.post('/logout', (req, res) => {
 router.get('/allRoles', getAllRoles);
 
 // Members
-router.get('/allMembers', allMembers);
-router.get('/getMember/:email', getMember);
-router.post('/setMember', setMember);
-router.post('/deleteMember', deleteMember);
-router.post('/updateMember', updateMember);
+router.get('/allMembers', async (req, res) => {
+  let handled = await allMembers(req, res);
+  res.status(handled.status).json(handled);
+});
+
+router.get('/getMember/:email', async (req, res) => {
+  let handled = await getMember(req, res);
+  res.status(handled.status).json(handled);
+});
+
+router.post('/setMember', async (req, res) => {
+  let handled = await setMember(req, res);
+  res.status(handled.status).json(handled);
+});
+
+router.delete('/deleteMember', async (req, res) => {
+  let handled = await deleteMember(req, res);
+  res.status(handled.status).json(handled);
+});
+
+router.post('/updateMember', async (req, res) => {
+  let handled = await updateMember(req, res);
+  res.status(handled.status).json(handled);
+});
 
 // Teams
 router.get('/allTeams', allTeams);
 router.post('/setTeam', setTeam);
-router.post('/deleteTeam', deleteTeam);
+router.delete('/deleteTeam', deleteTeam);
 
 app.use('/.netlify/functions/api', router);
 
