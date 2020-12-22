@@ -7,7 +7,6 @@ import {
   AllMembersResponse,
 } from './types/APITypes';
 import { Member } from './types/DataTypes';
-import { sendMessage } from './NovaAPI';
 
 export let allMembers = async (
   req: Request,
