@@ -1,16 +1,14 @@
-import { Member } from './DataTypes';
+import { Member, Team } from './DataTypes';
 
-type ErrorResponse = {
-  error: string;
-  status: number;
-};
+type APIResponse = { status: number };
 
-type MemberResponse = {
-  status: number;
-  member: Member;
-};
+// Errors
+export type ErrorResponse = APIResponse & { error: String };
 
-type AllMembersResponse = {
-  status: number;
-  members: Member[];
-};
+// Members
+export type MemberResponse = APIResponse & { member: Member };
+export type AllMembersResponse = APIResponse & { members: Member[] };
+
+// Teams
+export type TeamResponse = APIResponse & { team: Team };
+export type AllTeamsResponse = APIResponse & { teams: Team[] };
