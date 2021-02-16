@@ -20,9 +20,9 @@ export let allTeams = async (req, res) => {
 export let setTeam = async (req, res) => {
   if (checkLoggedIn(req, res)) {
     let teamBody = req.body as Team;
-    let member = (
+    let member = (await (
       await db.doc('members/' + req.session.email).get()
-    ).data() as any;
+    ).data()) as Member;
     let canEdit = PermissionsManager.canEditTeams(member.role);
     if (!canEdit) {
       res.status(200).json({
@@ -85,10 +85,10 @@ export let deleteTeam = async (req, res) => {
         .json({ error: "Couldn't delete team with undefined uuid!" });
       return;
     }
-    let member = (
+    let member = (await (
       await db.doc('members/' + req.session.email).get()
-    ).data() as any;
-    let teamSnap = await db.doc('teams/' + teamBody.uuid).get();
+    ).data()) as Member;
+    let teamSnap = await await db.doc('teams/' + teamBody.uuid).get();
     if (!teamSnap.exists) {
       res.status(200).json({ error: 'No team with uuid: ' + teamBody.uuid });
     } else {

@@ -6,7 +6,7 @@ type Member = {
   email: string;
   first_name: string;
   last_name: string;
-  role: string;
+  role: role;
   graduation: string;
   major: string;
   double_major?: string; //optional
