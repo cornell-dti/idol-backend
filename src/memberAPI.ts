@@ -4,9 +4,8 @@ import { PermissionsManager } from './permissions';
 import { Request, Response } from 'express';
 import { ErrorResponse, MemberResponse, AllMembersResponse } from './APITypes';
 import { Member } from './DataTypes';
-import { readJsonConfigFile } from 'typescript';
 
-export let allMembers = async (req, res): Promise<AllMembersResponse> => {
+export let allMembers = async (req: Request, res: Response): Promise<AllMembersResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     let members: Member[] = await db
       .collection('members')
@@ -19,16 +18,16 @@ export let allMembers = async (req, res): Promise<AllMembersResponse> => {
 };
 
 export let setMember = async (
-  req,
-  res
-): Promise<MemberResponse | ErrorResponse> => {
+  req: Request,
+  res: Response
+): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
-    let user = await (
-      await db.doc('members/' + req.session.email).get()
+    let user = (
+      await db.doc('members/' + req.session!.email).get()
     ).data();
     if (!user) {
       return {
-        error: 'No user with email: ' + req.session.email,
+        error: 'No user with email: ' + req.session!.email,
         status: 401,
       };
     } else {
@@ -37,7 +36,7 @@ export let setMember = async (
         return {
           error:
             'User with email: ' +
-            req.session.email +
+            req.session!.email +
             ' does not have permission to edit members!',
           status: 403,
         };
@@ -69,14 +68,14 @@ export let setMember = async (
 export let updateMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse> => {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
-    let user = await (
-      await db.doc('members/' + req.session.email).get()
+    let user = (
+      await db.doc('members/' + req.session!.email).get()
     ).data();
     if (!user) {
       return {
-        error: 'No user with email: ' + req.session.email,
+        error: 'No user with email: ' + req.session!.email,
         status: 401,
       };
     } else {
@@ -85,7 +84,7 @@ export let updateMember = async (
         return {
           error:
             'User with email: ' +
-            req.session.email +
+            req.session!.email +
             ' does not have permission to edit members!',
           status: 403,
         };
@@ -104,7 +103,7 @@ export let updateMember = async (
             status: 403,
             error:
               'User with email: ' +
-              req.session.email +
+              req.session!.email +
               ' does not have permission to edit member name or roles!',
           };
         }
@@ -133,29 +132,29 @@ export let updateMember = async (
 export let getMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse> => {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
-    let user = await (
-      await db.doc('members/' + req.session.email).get()
+    let user = (
+      await db.doc('members/' + req.session!.email).get()
     ).data();
     if (!user) {
       return {
-        error: 'No user with email: ' + req.session.email,
+        error: 'No user with email: ' + req.session!.email,
         status: 401,
       };
     } else {
       let canEdit: boolean = PermissionsManager.canEditMembers(user.role);
       let memberEmail: string = req.params.email;
-      if (!canEdit && memberEmail !== req.session.email) {
+      if (!canEdit && memberEmail !== req.session!.email) {
         return {
           error:
             'User with email: ' +
-            req.session.email +
+            req.session!.email +
             ' does not have permission to edit members!',
           status: 403,
         };
       }
-      let member = await (await db.doc('members/' + memberEmail).get()).data();
+      let member = (await db.doc('members/' + memberEmail).get()).data();
       if (!member) {
         return {
           status: 404,
@@ -173,7 +172,7 @@ export let getMember = async (
 export let deleteMember = async (
   req,
   res
-): Promise<MemberResponse | ErrorResponse> => {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     let user = await (
       await db.doc('members/' + req.session.email).get()
