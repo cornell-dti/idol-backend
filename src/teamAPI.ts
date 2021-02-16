@@ -4,22 +4,8 @@ import { PermissionsManager } from './permissions';
 import { checkLoggedIn } from './api';
 import { firestore } from 'firebase-admin';
 import { materialize } from './util';
-import { Member } from './memberAPI';
+import { Member, DBTeam, Team } from './DataTypes';
 import { v4 as uuidv4 } from 'uuid';
-
-export type DBTeam = {
-  uuid: string;
-  name: string;
-  leaders: firestore.DocumentReference[];
-  members: firestore.DocumentReference[];
-};
-
-export type Team = {
-  uuid: string;
-  name: string;
-  leaders: Member[];
-  members: Member[];
-};
 
 export let allTeams = async (req, res) => {
   if (checkLoggedIn(req, res)) {
@@ -85,6 +71,7 @@ export let setTeam = async (req, res) => {
                 status: 'Success',
                 team: { ...teamBody, uuid: teamRef.uuid },
               });
+
           })
           .catch((reason) => {
             res

@@ -5,7 +5,7 @@ let configureAccount = (sa) => {
   let configAcc = sa;
   let parsedPK;
   try {
-    parsedPK = JSON.parse(process.env.FIREBASE_PRIVATE_KEY);
+    parsedPK = JSON.parse(process.env.FIREBASE_PRIVATE_KEY as string);
   } catch (err) {
     parsedPK = process.env.FIREBASE_PRIVATE_KEY;
   }
