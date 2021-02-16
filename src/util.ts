@@ -68,7 +68,7 @@ export async function materialize(
           isDocRef(objectStruct[prop][0])
         ) {
           let refArr = objectStruct[prop] as Array<firestore.DocumentReference>;
-          let groupProm = [];
+          let groupProm: Promise<any>[] = [];
           for (let i = 0; i < refArr.length; i++) {
             let ref = refArr[i];
             let dataProm = ref

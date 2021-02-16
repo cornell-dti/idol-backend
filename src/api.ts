@@ -21,7 +21,7 @@ const app = express();
 const router = express.Router();
 const db = database;
 const PORT = process.env.PORT || 9000;
-const isProd: boolean = JSON.parse(process.env.IS_PROD);
+const isProd: boolean = JSON.parse(process.env.IS_PROD as string);
 const allowAllOrigins = false;
 const enforceSession = true;
 const allowedOrigins = allowAllOrigins
@@ -40,7 +40,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET as string,
     resave: true,
     saveUninitialized: true,
     store: new MemoryStore(),
@@ -88,9 +88,9 @@ router.post('/login', async (req, res) => {
         res.json({ isLoggedIn: false });
         return;
       }
-      req.session.isLoggedIn = true;
-      req.session.email = foundMember.email;
-      req.session.save((err) => {
+      req.session!.isLoggedIn = true;
+      req.session!.email = foundMember.email;
+      req.session!.save((err) => {
         err ? sessionErrCb(err) : null;
         res.json({ isLoggedIn: true });
       });
@@ -102,8 +102,8 @@ router.post('/login', async (req, res) => {
 
 // Logout
 router.post('/logout', (req, res) => {
-  req.session.isLoggedIn = false;
-  req.session.destroy((err) => {
+  req.session!.isLoggedIn = false;
+  req.session!.destroy((err) => {
     err ? sessionErrCb(err) : null;
     res.json({ isLoggedIn: false });
   });
@@ -115,27 +115,27 @@ router.get('/allRoles', getAllRoles);
 // Members
 router.get('/allMembers', async (req, res) => {
   let handled = await allMembers(req, res);
-  res.status(handled.status).json(handled);
+  res.status(handled!.status).json(handled);
 });
 
 router.get('/getMember/:email', async (req, res) => {
   let handled = await getMember(req, res);
-  res.status(handled.status).json(handled);
+  res.status(handled!.status).json(handled);
 });
 
 router.post('/setMember', async (req, res) => {
   let handled = await setMember(req, res);
-  res.status(handled.status).json(handled);
+  res.status(handled!.status).json(handled);
 });
 
 router.delete('/deleteMember', async (req, res) => {
   let handled = await deleteMember(req, res);
-  res.status(handled.status).json(handled);
+  res.status(handled!.status).json(handled);
 });
 
 router.post('/updateMember', async (req, res) => {
   let handled = await updateMember(req, res);
-  res.status(handled.status).json(handled);
+  res.status(handled!.status).json(handled);
 });
 
 // Teams
