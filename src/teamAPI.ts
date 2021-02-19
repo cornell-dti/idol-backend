@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, Request, Response } from 'express';
 import { db } from './firebase';
 import { PermissionsManager } from './permissions';
 import { checkLoggedIn } from './api';
@@ -7,7 +7,7 @@ import { materialize } from './util';
 import { Member, DBTeam, Team } from './DataTypes';
 import { v4 as uuidv4 } from 'uuid';
 
-export let allTeams = async (req, res) => {
+export let allTeams = async (req: Request, res: Response) => {
   if (checkLoggedIn(req, res)) {
     let teamRefs = await db.collection('teams').get();
     let resp = await Promise.all(
@@ -17,18 +17,18 @@ export let allTeams = async (req, res) => {
   }
 };
 
-export let setTeam = async (req, res) => {
+export let setTeam = async (req: Request, res: Response) => {
   if (checkLoggedIn(req, res)) {
     let teamBody = req.body as Team;
     let member = (
-      await db.doc('members/' + req.session.email).get()
+      await db.doc('members/' + req.session?.email).get()
     ).data() as any;
     let canEdit = PermissionsManager.canEditTeams(member.role);
     if (!canEdit) {
       res.status(200).json({
         error:
           'User with email: ' +
-          req.session.email +
+          req.session?.email +
           ' does not have permission to edit teams!',
       });
     } else {
@@ -76,7 +76,7 @@ export let setTeam = async (req, res) => {
   }
 };
 
-export let deleteTeam = async (req, res) => {
+export let deleteTeam = async (req: Request, res: Response) => {
   if (checkLoggedIn(req, res)) {
     let teamBody = req.body as Team;
     if (!teamBody.uuid || teamBody.uuid === '') {
@@ -86,7 +86,7 @@ export let deleteTeam = async (req, res) => {
       return;
     }
     let member = (
-      await db.doc('members/' + req.session.email).get()
+      await db.doc('members/' + req.session?.email).get()
     ).data() as any;
     let teamSnap = await db.doc('teams/' + teamBody.uuid).get();
     if (!teamSnap.exists) {
@@ -97,7 +97,7 @@ export let deleteTeam = async (req, res) => {
         res.status(200).json({
           error:
             'User with email: ' +
-            req.session.email +
+            req.session?.email +
             ' does not have permission to delete teams!',
         });
       } else {

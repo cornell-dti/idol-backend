@@ -5,7 +5,10 @@ import { Request, Response } from 'express';
 import { ErrorResponse, MemberResponse, AllMembersResponse } from './APITypes';
 import { Member } from './DataTypes';
 
-export let allMembers = async (req: Request, res: Response): Promise<AllMembersResponse | undefined> => {
+export let allMembers = async (
+  req: Request,
+  res: Response
+): Promise<AllMembersResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     let members: Member[] = await db
       .collection('members')
@@ -22,9 +25,7 @@ export let setMember = async (
   res: Response
 ): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
-    let user = (
-      await db.doc('members/' + req.session!.email).get()
-    ).data();
+    let user = (await db.doc('members/' + req.session!.email).get()).data();
     if (!user) {
       return {
         error: 'No user with email: ' + req.session!.email,
@@ -70,9 +71,7 @@ export let updateMember = async (
   res: Response
 ): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
-    let user = (
-      await db.doc('members/' + req.session!.email).get()
-    ).data();
+    let user = (await db.doc('members/' + req.session!.email).get()).data();
     if (!user) {
       return {
         error: 'No user with email: ' + req.session!.email,
@@ -134,9 +133,7 @@ export let getMember = async (
   res: Response
 ): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
-    let user = (
-      await db.doc('members/' + req.session!.email).get()
-    ).data();
+    let user = (await db.doc('members/' + req.session!.email).get()).data();
     if (!user) {
       return {
         error: 'No user with email: ' + req.session!.email,
@@ -170,16 +167,16 @@ export let getMember = async (
 };
 
 export let deleteMember = async (
-  req,
-  res
+  req: Request,
+  res: Response
 ): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     let user = await (
-      await db.doc('members/' + req.session.email).get()
+      await db.doc('members/' + req.session?.email).get()
     ).data();
     if (!user) {
       return {
-        error: 'No user with email: ' + req.session.email,
+        error: 'No user with email: ' + req.session?.email,
         status: 401,
       };
     } else {
@@ -188,7 +185,7 @@ export let deleteMember = async (
         return {
           error:
             'User with email: ' +
-            req.session.email +
+            req.session?.email +
             ' does not have permission to edit members!',
           status: 403,
         };

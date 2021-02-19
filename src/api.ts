@@ -1,5 +1,5 @@
 require('dotenv').config();
-import express from 'express';
+import express, { Request, Response } from 'express';
 import serverless from 'serverless-http';
 import cors from 'cors';
 import session, { MemoryStore } from 'express-session';
@@ -50,12 +50,12 @@ app.use(
     },
   })
 );
-let sessionErrCb = (err) => {
+let sessionErrCb = (err: string) => {
   console.log(err);
 };
 
 // Check valid session
-export let checkLoggedIn = (req, res): boolean => {
+export let checkLoggedIn = (req: Request, res: Response): boolean => {
   if (!enforceSession) {
     return true;
   }

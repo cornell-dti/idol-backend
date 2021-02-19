@@ -1,7 +1,9 @@
+require('dotenv').config();
+
 import admin from 'firebase-admin';
 var serviceAccount = require('../resources/idol-b6c68-firebase-adminsdk-h4e6t-40e4bd5536.json');
 
-let configureAccount = (sa: any) => {
+let configureAccount = (sa) => {
   let configAcc = sa;
   let parsedPK;
   try {
@@ -17,6 +19,8 @@ let configureAccount = (sa: any) => {
 export const app = admin.initializeApp({
   credential: admin.credential.cert(configureAccount(serviceAccount)),
   databaseURL: 'https://idol-b6c68.firebaseio.com',
+  storageBucket: 'gs://idol-b6c68.appspot.com',
 });
 
 export const db = admin.firestore();
+export const bucket = admin.storage().bucket();
