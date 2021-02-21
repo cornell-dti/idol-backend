@@ -1,7 +1,7 @@
 // This file contains common operations that will need to be performed often.
 
-import { firestore } from "firebase-admin";
-import { isUndefined } from "util";
+import { firestore } from 'firebase-admin';
+import { isUndefined } from 'util';
 
 /**
  * This function takes a collection reference and turns it into an array
@@ -13,7 +13,7 @@ export async function docRefArrayFromCollectionRef(
   coll: firestore.CollectionReference
 ): Promise<Array<any>> {
   // Init array
-  let insArr: firestore.DocumentReference[] = [];
+  const insArr: firestore.DocumentReference[] = [];
   // Go through each doc and add their reference
   return coll.get().then((snapshot) => {
     snapshot.forEach((element) => {
@@ -44,22 +44,23 @@ export async function materialize(
       res(object);
     }
 
-    let objectStruct = Object.assign({}, object);
+    const objectStruct = { ...object };
 
-    let propToProm: [string, Promise<any>][] = [];
+    const propToProm: [string, Promise<any>][] = [];
 
     let foundAProp = false;
 
-    for (let prop in objectStruct) {
-      if (objectStruct[prop] && Object.prototype.hasOwnProperty.call(objectStruct, prop)) {
+    for (const prop in objectStruct) {
+      if (
+        objectStruct[prop] &&
+        Object.prototype.hasOwnProperty.call(objectStruct, prop)
+      ) {
         if (isDocRef(objectStruct[prop])) {
-          let ref = objectStruct[prop] as firestore.DocumentReference;
-          let dataProm = ref
+          const ref = objectStruct[prop] as firestore.DocumentReference;
+          const dataProm = ref
             .get()
             .then((val) => val.data())
-            .then((data) => {
-              return materialize(data, depth - 1);
-            });
+            .then((data) => materialize(data, depth - 1));
           propToProm.push([prop, dataProm]);
           foundAProp = true;
         } else if (
@@ -67,27 +68,27 @@ export async function materialize(
           objectStruct[prop].length > 0 &&
           isDocRef(objectStruct[prop][0])
         ) {
-          let refArr = objectStruct[prop] as Array<firestore.DocumentReference>;
-          let groupProm: Promise<any>[] = [];
+          const refArr = objectStruct[
+            prop
+          ] as Array<firestore.DocumentReference>;
+          const groupProm: Promise<any>[] = [];
           for (let i = 0; i < refArr.length; i++) {
-            let ref = refArr[i];
-            let dataProm = ref
+            const ref = refArr[i];
+            const dataProm = ref
               .get()
               .then((valRet) => valRet.data())
-              .then((data) => {
-                return materialize(data, depth - 1);
-              });
+              .then((data) => materialize(data, depth - 1));
             groupProm.push(dataProm);
           }
           propToProm.push([prop, Promise.all(groupProm)]);
           foundAProp = true;
         } else if (isCollRef(objectStruct[prop])) {
-          let collection = objectStruct[prop] as firestore.CollectionReference;
-          let promRet = docRefArrayFromCollectionRef(collection).then(
-            (colAsArr) => {
-              return materialize(colAsArr, depth - 1);
-            }
-          );
+          const collection = objectStruct[
+            prop
+          ] as firestore.CollectionReference;
+          const promRet = docRefArrayFromCollectionRef(
+            collection
+          ).then((colAsArr) => materialize(colAsArr, depth - 1));
           propToProm.push([prop, promRet]);
           foundAProp = true;
         }
@@ -98,7 +99,7 @@ export async function materialize(
       res(objectStruct);
     }
 
-    let waitForThese: Promise<any>[] = propToProm.map(([k, v]) => v);
+    const waitForThese: Promise<any>[] = propToProm.map(([k, v]) => v);
 
     return Promise.all(waitForThese).then((values) => {
       for (let i = 0; i < values.length; i++) {
@@ -111,16 +112,16 @@ export async function materialize(
 
 function isDocRef(val: any) {
   return (
-    typeof val.collection === "function" &&
-    typeof val.doc === "undefined" &&
-    typeof val.startAfter === "undefined"
+    typeof val.collection === 'function' &&
+    typeof val.doc === 'undefined' &&
+    typeof val.startAfter === 'undefined'
   );
 }
 
 function isCollRef(val: any) {
   return (
-    typeof val.collection === "undefined" &&
-    typeof val.doc === "function" &&
-    typeof val.startAfter === "function"
+    typeof val.collection === 'undefined' &&
+    typeof val.doc === 'function' &&
+    typeof val.startAfter === 'function'
   );
 }

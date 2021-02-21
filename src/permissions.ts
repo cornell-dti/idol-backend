@@ -6,23 +6,21 @@ export const allRoles: role[] = [
   'tpm',
   'pm',
   'developer',
-  'designer',
+  'designer'
 ];
 
 export class PermissionsManager {
   static canEditMembers(role: role): boolean {
     if (role === 'lead' || role === 'admin') {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   static canEditTeams(role: role): boolean {
     if (role === 'lead' || role === 'admin') {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 }

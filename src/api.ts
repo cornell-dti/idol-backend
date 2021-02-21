@@ -1,20 +1,21 @@
-require('dotenv').config();
 import express from 'express';
 import serverless from 'serverless-http';
 import cors from 'cors';
 import session, { MemoryStore } from 'express-session';
-import { db as database, app as adminApp } from './firebase';
 import bodyParser from 'body-parser';
 import admin from 'firebase-admin';
+import { db as database, app as adminApp } from './firebase';
 import {
   allMembers,
   getMember,
   setMember,
   deleteMember,
-  updateMember,
+  updateMember
 } from './memberAPI';
 import { getAllRoles } from './roleAPI';
 import { allTeams, setTeam, deleteTeam } from './teamAPI';
+
+require('dotenv').config();
 
 // Constants and configurations
 const app = express();
@@ -34,7 +35,7 @@ const allowedOrigins = allowAllOrigins
 app.use(
   cors({
     origin: allowedOrigins,
-    credentials: true,
+    credentials: true
   })
 );
 app.use(bodyParser.json());
@@ -45,45 +46,40 @@ app.use(
     saveUninitialized: true,
     store: new MemoryStore(),
     cookie: {
-      secure: isProd ? true : false,
-      maxAge: 3600000,
-    },
+      secure: !!isProd,
+      maxAge: 3600000
+    }
   })
 );
-let sessionErrCb = (err) => {
+const sessionErrCb = (err) => {
   console.log(err);
 };
 
 // Check valid session
-export let checkLoggedIn = (req, res): boolean => {
+export const checkLoggedIn = (req, res): boolean => {
   if (!enforceSession) {
     return true;
   }
   if (req.session?.isLoggedIn) {
     return true;
-  } else {
-    // Session expired
-    res.status(440).json({ error: 'Not logged in!' });
-    return false;
   }
+  // Session expired
+  res.status(440).json({ error: 'Not logged in!' });
+  return false;
 };
 
 // Login
 router.post('/login', async (req, res) => {
-  let members = await db
+  const members = await db
     .collection('members')
     .get()
-    .then((vals) => {
-      return vals.docs.map((doc) => {
-        return doc.data();
-      });
-    });
-  let auth_token = req.body.auth_token;
+    .then((vals) => vals.docs.map((doc) => doc.data()));
+  const { auth_token } = req.body;
   admin
     .auth(adminApp)
     .verifyIdToken(auth_token)
     .then((decoded) => {
-      let foundMember = members.find((val) => val.email === decoded.email);
+      const foundMember = members.find((val) => val.email === decoded.email);
       if (!foundMember) {
         res.json({ isLoggedIn: false });
         return;
@@ -114,27 +110,27 @@ router.get('/allRoles', getAllRoles);
 
 // Members
 router.get('/allMembers', async (req, res) => {
-  let handled = await allMembers(req, res);
+  const handled = await allMembers(req, res);
   res.status(handled!.status).json(handled);
 });
 
 router.get('/getMember/:email', async (req, res) => {
-  let handled = await getMember(req, res);
+  const handled = await getMember(req, res);
   res.status(handled!.status).json(handled);
 });
 
 router.post('/setMember', async (req, res) => {
-  let handled = await setMember(req, res);
+  const handled = await setMember(req, res);
   res.status(handled!.status).json(handled);
 });
 
 router.delete('/deleteMember', async (req, res) => {
-  let handled = await deleteMember(req, res);
+  const handled = await deleteMember(req, res);
   res.status(handled!.status).json(handled);
 });
 
 router.post('/updateMember', async (req, res) => {
-  let handled = await updateMember(req, res);
+  const handled = await updateMember(req, res);
   res.status(handled!.status).json(handled);
 });
 
@@ -148,7 +144,7 @@ app.use('/.netlify/functions/api', router);
 // Startup local server if not production (prod is serverless)
 if (!isProd) {
   app.listen(PORT, () => {
-    console.log('IDOL backend listening on port: ' + PORT);
+    console.log(`IDOL backend listening on port: ${PORT}`);
   });
 }
 
