@@ -5,3 +5,7 @@ build/
 functions/
 
 .env
+
+scripts/members/*
+
+data/members/*

@@ -1,0 +1,26 @@
+{
+    "extends": [
+        "airbnb-base",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended",
+        "prettier",
+        "prettier/@typescript-eslint"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint",
+        "prettier"
+    ],
+    "env": {
+        "node": true
+    },
+    "rules": {
+        "camelcase": "off",
+        "no-console": 0,
+        "@typescript-eslint/no-var-requires": 0,
+        "@typescript-eslint/camel-case": [
+            "off"
+        ],
+        "import/extensions": "off"
+    }
+}
