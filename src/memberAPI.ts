@@ -18,7 +18,7 @@ export const allMembers = async function (
       });
     return {
       status: 200,
-      members: members
+      members
     };
   }
 };
@@ -41,8 +41,9 @@ export const setMember = async function (
     if (!canEdit) {
       return {
         status: 403,
-        error: `User with email: ${req.session!.email
-          } does not have permission to edit members!`
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to edit members!`
       };
     }
     if (!req.body.email || req.body.email === '') {
@@ -89,8 +90,9 @@ export const updateMember = async function (
       // members are able to edit their own information
       return {
         status: 403,
-        error: `User with email: ${req.session!.email
-          } does not have permission to edit members!`
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to edit members!`
       };
     }
     if (!req.body.email || req.body.email === '') {
@@ -105,8 +107,9 @@ export const updateMember = async function (
     ) {
       return {
         status: 403,
-        error: `User with email: ${req.session!.email
-          } does not have permission to edit member name or roles!`
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to edit member name or roles!`
       };
     }
     const member = await (
@@ -157,8 +160,9 @@ export const getMember = async function (
     if (!canEdit && memberEmail !== req.session!.email) {
       return {
         status: 403,
-        error: `User with email: ${req.session!.email
-          } does not have permission to get members!`
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to get members!`
       };
     }
     const response: MemberResponse | ErrorResponse = await db
@@ -205,7 +209,9 @@ export const deleteMember = async function (
     if (!canEdit) {
       return {
         status: 403,
-        error: `User with email: ${req.session!.email} does not have permission to delete members!`
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to delete members!`
       };
     }
     if (!req.body.email || req.body.email === '') {
