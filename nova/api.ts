@@ -37,5 +37,6 @@ router.post('/api/message', async (req: Request, res: Response) => {
 server.use('/.netlify/functions/api', router);
 
 server.listen(PORT, () => {
+  console.log(`NOVA server listening on port: ${PORT}`);
   getMembers();
 });
