@@ -25,6 +25,7 @@ const PORT = process.env.PORT || 9000;
 const isProd: boolean = JSON.parse(process.env.IS_PROD as string);
 const allowAllOrigins = false;
 const enforceSession = true;
+// eslint-disable-next-line no-nested-ternary
 const allowedOrigins = allowAllOrigins
   ? [/.*/]
   : isProd
@@ -87,11 +88,11 @@ router.post('/login', async (req, res) => {
       req.session!.isLoggedIn = true;
       req.session!.email = foundMember.email;
       req.session!.save((err) => {
-        err ? sessionErrCb(err) : null;
+        if (err) sessionErrCb(err);
         res.json({ isLoggedIn: true });
       });
     })
-    .catch((reason) => {
+    .catch(() => {
       res.json({ isLoggedIn: false });
     });
 });
@@ -100,7 +101,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', (req, res) => {
   req.session!.isLoggedIn = false;
   req.session!.destroy((err) => {
-    err ? sessionErrCb(err) : null;
+    if (err) sessionErrCb(err);
     res.json({ isLoggedIn: false });
   });
 });

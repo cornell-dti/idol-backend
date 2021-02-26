@@ -1,12 +1,12 @@
 import { firestore } from 'firebase-admin';
 
-export type role = 'lead' | 'admin' | 'tpm' | 'pm' | 'developer' | 'designer';
+export type Role = 'lead' | 'admin' | 'tpm' | 'pm' | 'developer' | 'designer';
 
 export type Member = {
   email: string;
   first_name: string;
   last_name: string;
-  role: role;
+  role: Role;
   graduation: string;
   major: string;
   double_major?: string; // optional

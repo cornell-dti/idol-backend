@@ -1,6 +1,6 @@
-import { role } from './DataTypes';
+import { Role } from './DataTypes';
 
-export const allRoles: role[] = [
+export const allRoles: Role[] = [
   'lead',
   'admin',
   'tpm',
@@ -10,14 +10,14 @@ export const allRoles: role[] = [
 ];
 
 export class PermissionsManager {
-  static canEditMembers(role: role): boolean {
+  static canEditMembers(role: Role): boolean {
     if (role === 'lead' || role === 'admin') {
       return true;
     }
     return false;
   }
 
-  static canEditTeams(role: role): boolean {
+  static canEditTeams(role: Role): boolean {
     if (role === 'lead' || role === 'admin') {
       return true;
     }

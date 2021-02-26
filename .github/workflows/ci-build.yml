@@ -1,0 +1,28 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+      - name: Install
+        run: npm i
+      - name: Lint
+        run: npm run lint:check
+      - name: Format
+        run: npm run prettier-check
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+      - name: Install
+        run: npm i
+      - name: Build
+        run: npm run functions

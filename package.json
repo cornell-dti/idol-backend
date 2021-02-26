@@ -8,7 +8,9 @@
     "dev": "ts-node src/api.ts",
     "functions": "tsc",
     "lint": "eslint . --ext .ts --fix",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "lint:check": "eslint . --ext .ts",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "prettier-check": "prettier --config .prettierrc 'src/**/*.ts' --check"
   },
   "author": "Jagger Brulato",
   "license": "ISC",

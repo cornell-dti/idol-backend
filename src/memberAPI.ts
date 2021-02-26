@@ -5,10 +5,10 @@ import { PermissionsManager } from './permissions';
 import { Member } from './DataTypes';
 import { ErrorResponse, MemberResponse, AllMembersResponse } from './APITypes';
 
-export const allMembers = async function (
+export const allMembers = async (
   req: Request,
   res: Response
-): Promise<AllMembersResponse | ErrorResponse | undefined> {
+): Promise<AllMembersResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     const members: Member[] = await db
       .collection('members')
@@ -21,12 +21,13 @@ export const allMembers = async function (
       members
     };
   }
+  return undefined;
 };
 
-export const setMember = async function (
+export const setMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse | undefined> {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     const user = await (
       await db.doc(`members/${req.session!.email}`).get()
@@ -69,12 +70,13 @@ export const setMember = async function (
       });
     return response;
   }
+  return undefined;
 };
 
-export const updateMember = async function (
+export const updateMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse | undefined> {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     const user = await (
       await db.doc(`members/${req.session!.email}`).get()
@@ -138,12 +140,13 @@ export const updateMember = async function (
       });
     return response;
   }
+  return undefined;
 };
 
-export const getMember = async function (
+export const getMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse | undefined> {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     const user = await (
       await db.doc(`members/${req.session!.email}`).get()
@@ -189,6 +192,7 @@ export const getMember = async function (
       });
     return response;
   }
+  return undefined;
 };
 
 export const deleteMember = async function (
@@ -237,4 +241,5 @@ export const deleteMember = async function (
       });
     return response;
   }
+  return undefined;
 };

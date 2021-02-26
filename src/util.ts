@@ -1,7 +1,6 @@
 // This file contains common operations that will need to be performed often.
 
 import { firestore } from 'firebase-admin';
-import { isUndefined } from 'util';
 
 /**
  * This function takes a collection reference and turns it into an array
@@ -72,7 +71,7 @@ export async function materialize(
             prop
           ] as Array<firestore.DocumentReference>;
           const groupProm: Promise<any>[] = [];
-          for (let i = 0; i < refArr.length; i++) {
+          for (let i = 0; i < refArr.length; i += 1) {
             const ref = refArr[i];
             const dataProm = ref
               .get()
@@ -102,7 +101,7 @@ export async function materialize(
     const waitForThese: Promise<any>[] = propToProm.map(([k, v]) => v);
 
     return Promise.all(waitForThese).then((values) => {
-      for (let i = 0; i < values.length; i++) {
+      for (let i = 0; i < values.length; i += 1) {
         objectStruct[propToProm[i][0]] = values[i];
       }
       res(objectStruct);

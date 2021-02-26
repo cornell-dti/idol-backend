@@ -4,6 +4,7 @@ const removeEmptyOrNull = (obj) => {
   Object.keys(obj).forEach(
     (k) =>
       (obj[k] && typeof obj[k] === 'object' && removeEmptyOrNull(obj[k])) ||
+      // eslint-disable-next-line no-param-reassign
       (!obj[k] && obj[k] !== undefined && delete obj[k])
   );
   return obj;
@@ -21,6 +22,7 @@ db.collection('members')
   .then((vals) => vals.docs.map((doc) => doc.data().email))
   .then((existingEmails: string[]) => {
     jsonFilesList.forEach((fileName) => {
+      // eslint-disable-next-line import/no-dynamic-require, global-require
       const jsonData = require(dirPath + fileName);
       const email: string = jsonData.netid + emailDomain;
 
