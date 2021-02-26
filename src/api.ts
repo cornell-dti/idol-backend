@@ -113,17 +113,14 @@ router.get('/allMembers', async (req, res) => {
   const handled = await allMembers(req, res);
   res.status(handled!.status).json(handled);
 });
-
 router.get('/getMember/:email', async (req, res) => {
   const handled = await getMember(req, res);
   res.status(handled!.status).json(handled);
 });
-
 router.post('/setMember', async (req, res) => {
   const handled = await setMember(req, res);
   res.status(handled!.status).json(handled);
 });
-
 router.delete('/deleteMember', async (req, res) => {
   const handled = await deleteMember(req, res);
   res.status(handled!.status).json(handled);
