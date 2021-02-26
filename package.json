@@ -7,12 +7,9 @@
     "start": "./node_modules/.bin/netlify-lambda serve build",
     "dev": "ts-node src/api.ts",
     "functions": "tsc",
-<<<<<<< HEAD
-    "nova": "ts-node nova/api.ts"
-=======
+    "nova": "ts-node nova/api.ts",
     "lint": "eslint . --ext .ts --fix",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
->>>>>>> master
   },
   "author": "Jagger Brulato",
   "license": "ISC",
