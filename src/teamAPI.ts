@@ -1,18 +1,17 @@
-import { RequestHandler, Request, Response } from 'express';
-import { firestore } from 'firebase-admin';
+import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from './firebase';
 import { PermissionsManager } from './permissions';
 import { checkLoggedIn } from './api';
 import { materialize } from './util';
-import { Member, Team, DBTeam } from './DataTypes';
+import { Team, DBTeam } from './DataTypes';
 
 import { ErrorResponse, TeamResponse, AllTeamsResponse } from './APITypes';
 
-export const allTeams = async function (
+export const allTeams = async (
   req: Request,
   res: Response
-): Promise<AllTeamsResponse | ErrorResponse> {
+): Promise<AllTeamsResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     const teamRefs = await db.collection('teams').get();
     const resp = await Promise.all(
@@ -23,22 +22,25 @@ export const allTeams = async function (
       teams: resp
     };
   }
+  return undefined;
 };
 
-export const setTeam = async function (
+export const setTeam = async (
   req: Request,
   res: Response
-): Promise<TeamResponse | ErrorResponse> {
+): Promise<TeamResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     const teamBody = req.body as Team;
     const member = await (
-      await db.doc(`members/${req.session.email}`).get()
+      await db.doc(`members/${req.session!.email}`).get()
     ).data();
-    const canEdit = PermissionsManager.canEditTeams(member.role);
+    const canEdit = PermissionsManager.canEditTeams(member!.role);
     if (!canEdit) {
       return {
         status: 403,
-        error: `User with email: ${req.session.email} does not have permission to edit teams!`
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to edit teams!`
       };
     }
     if (teamBody.leaders.length > 0 && !teamBody.leaders[0].email) {
@@ -66,7 +68,7 @@ export const setTeam = async function (
         .concat(teamRef.members)
         .map((ref) => ref.get().then((val) => val.exists))
     );
-    if (existRes.findIndex((val) => val === false) != -1) {
+    if (existRes.findIndex((val) => val === false) !== -1) {
       return {
         status: 404,
         error: "Couldn't create team from members that don't exist!"
@@ -87,12 +89,13 @@ export const setTeam = async function (
         };
       });
   }
+  return undefined;
 };
 
-export const deleteTeam = async function (
+export const deleteTeam = async (
   req: Request,
   res: Response
-): Promise<TeamResponse | ErrorResponse> {
+): Promise<TeamResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     const teamBody = req.body as Team;
     if (!teamBody.uuid || teamBody.uuid === '') {
@@ -102,7 +105,7 @@ export const deleteTeam = async function (
       };
     }
     const member = (await (
-      await db.doc(`members/${req.session.email}`).get()
+      await db.doc(`members/${req.session!.email}`).get()
     ).data()) as any;
     const teamSnap = await await db.doc(`teams/${teamBody.uuid}`).get();
     if (!teamSnap.exists) {
@@ -115,7 +118,9 @@ export const deleteTeam = async function (
     if (!canEdit) {
       return {
         status: 403,
-        error: `User with email: ${req.session.email} does not have permission to delete teams!`
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to delete teams!`
       };
     }
     db.doc(`teams/${teamBody.uuid}`)
@@ -133,4 +138,5 @@ export const deleteTeam = async function (
         };
       });
   }
+  return undefined;
 };
