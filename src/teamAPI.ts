@@ -3,7 +3,7 @@ import { db } from './firebase';
 import { PermissionsManager } from './permissions';
 import { checkLoggedIn } from './api';
 import { Team } from './DataTypes';
-import { TeamsDao } from './dao/TeamsDao';
+import TeamsDao from './dao/TeamsDao';
 import { ErrorResponse, TeamResponse, AllTeamsResponse } from './APITypes';
 
 export const allTeams = async (

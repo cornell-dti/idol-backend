@@ -1,4 +1,4 @@
-import { Member, Team } from '../DataTypes';
+import { Member, Team } from './DataTypes';
 
 type DBResult = { isSuccessful: boolean; error?: string };
 

@@ -1,8 +1,8 @@
 import { Member } from '../DataTypes';
-import { DBAllMembersResult, DBMemberResult } from '../types/DBResultTypes';
+import { DBAllMembersResult, DBMemberResult } from '../DBResultTypes';
 import { db } from '../firebase';
 
-export class MembersDao {
+export default class MembersDao {
   static async getAllMembers(): Promise<DBAllMembersResult> {
     const members: Member[] = await db
       .collection('members')

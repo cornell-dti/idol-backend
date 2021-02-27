@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { Team, DBTeam } from '../DataTypes';
 import { db } from '../firebase';
 import { materialize } from '../util';
-import { DBAllTeamsResult, DBTeamResult } from '../types/DBResultTypes';
+import { DBAllTeamsResult, DBTeamResult } from '../DBResultTypes';
 
-export class TeamsDao {
+export default class TeamsDao {
   static async getAllTeams(): Promise<DBAllTeamsResult> {
     const teamRefs = await db.collection('teams').get();
     const teams = await Promise.all(

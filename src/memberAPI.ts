@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { MembersDao } from './dao/MembersDao';
+import MembersDao from './dao/MembersDao';
 import { db } from './firebase';
 import { checkLoggedIn } from './api';
 import { PermissionsManager } from './permissions';
