@@ -3,7 +3,7 @@ import { Member, Team } from './DataTypes';
 type APIResponse = { status: number };
 
 // Errors
-export type ErrorResponse = APIResponse & { error: String };
+export type ErrorResponse = APIResponse & { error: string };
 
 // Members
 export type MemberResponse = APIResponse & { member: Member };

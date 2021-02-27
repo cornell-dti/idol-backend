@@ -4,33 +4,32 @@ const removeEmptyOrNull = (obj) => {
   Object.keys(obj).forEach(
     (k) =>
       (obj[k] && typeof obj[k] === 'object' && removeEmptyOrNull(obj[k])) ||
+      // eslint-disable-next-line no-param-reassign
       (!obj[k] && obj[k] !== undefined && delete obj[k])
   );
   return obj;
 };
 
-const dirPath: string = './members/';
-const filesPath: string = './data/members/';
+const dirPath = './members/';
+const filesPath = './data/members/';
 const fs = require('fs');
+
 const jsonFilesList: string[] = fs.readdirSync(filesPath);
-const emailDomain: string = '@cornell.edu';
+const emailDomain = '@cornell.edu';
 
 db.collection('members')
   .get()
-  .then((vals) => {
-    return vals.docs.map((doc) => {
-      return doc.data().email;
-    });
-  })
+  .then((vals) => vals.docs.map((doc) => doc.data().email))
   .then((existingEmails: string[]) => {
     jsonFilesList.forEach((fileName) => {
-      let jsonData = require(dirPath + fileName);
+      // eslint-disable-next-line import/no-dynamic-require, global-require
+      const jsonData = require(dirPath + fileName);
       const email: string = jsonData.netid + emailDomain;
 
-      let data = {
+      const data = {
         first_name: jsonData.firstName,
         last_name: jsonData.lastName,
-        email: email,
+        email,
         role: jsonData.roleId,
         about: jsonData.about,
         github_link: jsonData.github,
@@ -42,16 +41,16 @@ db.collection('members')
         graduation: jsonData.graduation,
         subteam: jsonData.subteam,
         other_subteams: jsonData.otherSubteams,
-        website: jsonData.website,
+        website: jsonData.website
       };
 
       removeEmptyOrNull(data);
 
       if (data.website) {
         if (existingEmails.includes(email)) {
-          db.doc('members/' + email).update(data);
+          db.doc(`members/${email}`).update(data);
         } else {
-          db.doc('members/' + email).set(data);
+          db.doc(`members/${email}`).set(data);
         }
       }
     });

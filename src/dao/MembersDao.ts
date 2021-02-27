@@ -1,27 +1,27 @@
 import { Member } from '../types/DataTypes';
-import { DBAllMembersResult, DBMemberResult } from './../types/DBResultTypes';
-import { db } from './../firebase';
+import { DBAllMembersResult, DBMemberResult } from '../types/DBResultTypes';
+import { db } from '../firebase';
 
 export class MembersDao {
   static async getAllMembers(): Promise<DBAllMembersResult> {
-    let members: Member[] = await db
+    const members: Member[] = await db
       .collection('members')
       .get()
       .then((vals) => {
         return vals.docs.map((doc) => doc.data()) as Member[];
       });
-    return { members: members, isSuccessful: true };
+    return { members, isSuccessful: true };
   }
 
   static async getMember(email: string): Promise<DBMemberResult> {
-    let member = (await (
+    const member = (await (
       await db.doc(`members/${email}`).get()
     ).data()) as Member;
-    return { member: member, isSuccessful: true };
+    return { member, isSuccessful: true };
   }
 
   static async deleteMember(email: string): Promise<DBMemberResult> {
-    let result = await db
+    const result = await db
       .doc(`members/${email}`)
       .delete()
       .then(() => {
@@ -31,7 +31,7 @@ export class MembersDao {
         return {
           isSuccessful: false,
           error: `Unable to to delete member for reason: ${reason}`,
-          member: null,
+          member: null
         };
       });
     return result;
@@ -41,17 +41,17 @@ export class MembersDao {
     email: string,
     member: Member
   ): Promise<DBMemberResult> {
-    let result = await db
+    const result = await db
       .doc(`members/${email}`)
       .set(member)
       .then(() => {
-        return { isSuccessful: true, member: member };
+        return { isSuccessful: true, member };
       })
       .catch((reason) => {
         return {
           isSuccessful: false,
           error: `Unable to edit member for reason: ${reason}`,
-          member: member,
+          member
         };
       });
     return result;

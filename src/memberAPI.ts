@@ -1,73 +1,91 @@
-import { MembersDao } from './dao/MembersDao';
-import { PermissionsManager } from './permissions';
 import { Request, Response } from 'express';
-import {
-  ErrorResponse,
-  MemberResponse,
-  AllMembersResponse,
-} from './types/APITypes';
-import { Member } from './types/DataTypes';
+import { MembersDao } from './dao/MembersDao';
+import { db } from './firebase';
+import { checkLoggedIn } from './api';
+import { PermissionsManager } from './permissions';
+import { Member } from './DataTypes';
+import { ErrorResponse, MemberResponse, AllMembersResponse } from './APITypes';
 
-export let allMembers = async (
+export const allMembers = async (
   req: Request,
   res: Response
-): Promise<AllMembersResponse> => {
-  let result = await MembersDao.getAllMembers();
-  return { members: result.members, status: 200 };
+): Promise<AllMembersResponse | ErrorResponse | undefined> => {
+  if (checkLoggedIn(req, res)) {
+    const result = await MembersDao.getAllMembers();
+    return {
+      status: 200,
+      members: result.members
+    };
+  }
+  return undefined;
 };
 
-export let setMember = async (
+export const setMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse> => {
-  let user = req.res.locals.user;
-  let canEdit = PermissionsManager.canEditMembers(user.role);
-  if (!canEdit) {
-    return {
-      error:
-        'User with email: ' +
-        req.session.email +
-        ' does not have permission to edit members!',
-      status: 403,
-    };
-  } else {
-    if (!req.body.email || req.body.email === '') {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
+  if (checkLoggedIn(req, res)) {
+    const user = await (
+      await db.doc(`members/${req.session!.email}`).get()
+    ).data();
+    if (!user) {
       return {
-        error: "Couldn't edit member with undefined email!",
-        status: 400,
+        status: 401,
+        error: `No user with email: ${req.session!.email}`
       };
     }
-    let result = await MembersDao.setMember(req.body.email, req.body);
+    const canEdit = PermissionsManager.canEditMembers(user.role);
+    if (!canEdit) {
+      return {
+        status: 403,
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to edit members!`
+      };
+    }
+    if (!req.body.email || req.body.email === '') {
+      return {
+        status: 400,
+        error: "Couldn't edit member with undefined email!"
+      };
+    }
+    const result = await MembersDao.setMember(req.body.email, req.body);
     if (result.isSuccessful) {
       return { status: 200, member: result.member };
-    } else {
-      return {
-        error: result.error,
-        status: 500,
-      };
     }
+    return { error: result.error!, status: 500 };
   }
+  return undefined;
 };
 
-export let updateMember = async (
+export const updateMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse> => {
-  let user = req.res.locals.user;
-  let canEdit: boolean = PermissionsManager.canEditMembers(user.role);
-  if (!canEdit && user.email !== req.body.email) {
-    return {
-      error:
-        'User with email: ' +
-        req.session.email +
-        ' does not have permission to edit members!',
-      status: 403,
-    };
-  } else {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
+  if (checkLoggedIn(req, res)) {
+    const user = await (
+      await db.doc(`members/${req.session!.email}`).get()
+    ).data();
+    if (!user) {
+      return {
+        status: 401,
+        error: `No user with email: ${req.session!.email}`
+      };
+    }
+    const canEdit = PermissionsManager.canEditMembers(user.role);
+    if (!canEdit && user.email !== req.body.email) {
+      // members are able to edit their own information
+      return {
+        status: 403,
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to edit members!`
+      };
+    }
     if (!req.body.email || req.body.email === '') {
       return {
-        error: "Couldn't edit member with undefined email!",
         status: 400,
+        error: "Couldn't edit member with undefined email!"
       };
     }
     if (
@@ -76,82 +94,93 @@ export let updateMember = async (
     ) {
       return {
         status: 403,
-        error:
-          'User with email: ' +
-          req.session.email +
-          ' does not have permission to edit member name or roles!',
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to edit member name or roles!`
       };
     }
-    let result = await MembersDao.updateMember(req.body.email, req.body);
+    const result = await MembersDao.updateMember(req.body.email, req.body);
     if (result.isSuccessful) {
       return { member: result.member, status: 200 };
-    } else {
-      return {
-        status: 500,
-        error: result.error,
-      };
     }
+    return { status: 500, error: result.error! };
   }
+  return undefined;
 };
 
-export let getMember = async (
+export const getMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse> => {
-  let user = req.res.locals.user;
-  let canEdit: boolean = PermissionsManager.canEditMembers(user.role);
-  let memberEmail: string = req.params.email;
-  if (!canEdit && memberEmail !== req.session.email) {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
+  if (checkLoggedIn(req, res)) {
+    const user = await (
+      await db.doc(`members/${req.session!.email}`).get()
+    ).data();
+    if (!user) {
+      return {
+        status: 401,
+        error: `No user with email:${req.session!.email}`
+      };
+    }
+    const canEdit: boolean = PermissionsManager.canEditMembers(user.role);
+    const memberEmail: string = req.params.email;
+    if (!canEdit && memberEmail !== req.session!.email) {
+      return {
+        status: 403,
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to get members!`
+      };
+    }
+    const result = await MembersDao.getMember(memberEmail);
+    if (!result.member) {
+      return {
+        status: 404,
+        error: `Member with email: ${memberEmail} does not exist`
+      };
+    }
     return {
-      error:
-        'User with email: ' +
-        req.session.email +
-        ' does not have permission to edit members!',
-      status: 403,
+      member: result.member as Member,
+      status: 200
     };
   }
-  let result = await MembersDao.getMember(memberEmail);
-  if (!result.member) {
-    return {
-      status: 404,
-      error: 'Member with email: ' + memberEmail + ' does not exist',
-    };
-  }
-  return {
-    member: result.member as Member,
-    status: 200,
-  };
+  return undefined;
 };
 
-export let deleteMember = async (
-  req,
-  res
-): Promise<MemberResponse | ErrorResponse> => {
-  let user = req.res.locals.user;
-  let canEdit = PermissionsManager.canEditMembers(user.role);
-  if (!canEdit) {
-    return {
-      error:
-        'User with email: ' +
-        req.session.email +
-        ' does not have permission to edit members!',
-      status: 403,
-    };
-  } else {
+export const deleteMember = async (
+  req: Request,
+  res: Response
+): Promise<MemberResponse | ErrorResponse | undefined> => {
+  if (checkLoggedIn(req, res)) {
+    const user = await (
+      await db.doc(`members/${req.session!.email}`).get()
+    ).data();
+    if (!user) {
+      return {
+        status: 401,
+        error: `No user with email: ${req.session!.email}`
+      };
+    }
+    const canEdit = PermissionsManager.canEditMembers(user.role);
+    if (!canEdit) {
+      return {
+        status: 403,
+        error: `User with email: ${
+          req.session!.email
+        } does not have permission to delete members!`
+      };
+    }
     if (!req.body.email || req.body.email === '') {
       return {
-        error: "Couldn't delete member with undefined email!",
         status: 400,
+        error: "Couldn't delete member with undefined email!"
       };
     }
-    let result = await MembersDao.deleteMember(req.body.email);
+    const result = await MembersDao.deleteMember(req.body.email);
     if (result.isSuccessful) {
       return { member: result.member, status: 200 };
-    } else {
-      return {
-        status: 500,
-        error: result.error,
-      };
     }
+    return { status: 500, error: result.error! };
   }
+  return undefined;
 };
