@@ -10,23 +10,14 @@ const configureAccount = (sa) => {
   } catch (err) {
     parsedPK = process.env.FIREBASE_PRIVATE_KEY;
   }
-<<<<<<< HEAD
-  configAcc["private_key"] = parsedPK;
-  configAcc["private_key_id"] = process.env.FIREBASE_PRIVATE_KEY_ID;
-=======
   configAcc.private_key = parsedPK;
   configAcc.private_key_id = process.env.FIREBASE_PRIVATE_KEY_ID;
->>>>>>> master
   return configAcc;
 };
 
 export const app = admin.initializeApp({
   credential: admin.credential.cert(configureAccount(serviceAccount)),
-<<<<<<< HEAD
-  databaseURL: "https://idol-b6c68.firebaseio.com",
-=======
   databaseURL: 'https://idol-b6c68.firebaseio.com'
->>>>>>> master
 });
 
 export const db = admin.firestore();

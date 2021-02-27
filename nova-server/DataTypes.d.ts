@@ -9,11 +9,11 @@ type Member = {
   role: string;
   graduation: string;
   major: string;
-  double_major?: string; //optional
-  minor?: string; //optional
-  website?: string; //optional
-  linkedin_link?: string; //optional
-  github_link?: string; //optional
+  double_major?: string; // optional
+  minor?: string; // optional
+  website?: string; // optional
+  linkedin_link?: string; // optional
+  github_link?: string; // optional
   hometown: string;
   about: string;
   subteam: string;

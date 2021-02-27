@@ -2,9 +2,10 @@ import { db } from './firebase';
 import { getNetId } from './utils';
 
 const fs = require('fs');
-const dirPath: string = 'nova-server/members/';
 
-export let getMembers = () => {
+const dirPath = 'nova-server/members/';
+
+export const getMembers = () => {
   fs.mkdirSync(dirPath, { recursive: true });
   const jsonFilesList: string[] = fs.readdirSync(dirPath);
   jsonFilesList.forEach((json) =>
@@ -18,10 +19,10 @@ export let getMembers = () => {
     .get()
     .then((memberRefs) => {
       memberRefs.forEach((memberRef) => {
-        let member = memberRef.data();
-        let netId = getNetId(member.email);
+        const member = memberRef.data();
+        const netId = getNetId(member.email);
         fs.writeFile(
-          dirPath + `${netId}.json`,
+          `${dirPath}${netId}.json`,
           JSON.stringify(member),
           (err) => {
             if (err) {

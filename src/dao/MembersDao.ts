@@ -1,4 +1,4 @@
-import { Member } from '../types/DataTypes';
+import { Member } from '../DataTypes';
 import { DBAllMembersResult, DBMemberResult } from '../types/DBResultTypes';
 import { db } from '../firebase';
 
@@ -21,27 +21,26 @@ export class MembersDao {
   }
 
   static async deleteMember(email: string): Promise<DBMemberResult> {
-    const result = await db
+    return db
       .doc(`members/${email}`)
       .delete()
       .then(() => {
-        return { isSuccessful: true, member: null };
+        return { isSuccessful: true, member: null! };
       })
       .catch((reason) => {
         return {
           isSuccessful: false,
           error: `Unable to to delete member for reason: ${reason}`,
-          member: null
+          member: null!
         };
       });
-    return result;
   }
 
   static async setMember(
     email: string,
     member: Member
   ): Promise<DBMemberResult> {
-    const result = await db
+    return db
       .doc(`members/${email}`)
       .set(member)
       .then(() => {
@@ -54,26 +53,24 @@ export class MembersDao {
           member
         };
       });
-    return result;
   }
 
   static async updateMember(
     email: string,
     member: Member
   ): Promise<DBMemberResult> {
-    let result = await db
+    return db
       .doc(`members/${email}`)
       .update(member)
       .then(() => {
-        return { isSuccessful: true, member: member };
+        return { isSuccessful: true, member };
       })
       .catch((reason) => {
         return {
           isSuccessful: false,
           error: `Unable to edit member for reason: ${reason}`,
-          member: member,
+          member
         };
       });
-    return result;
   }
 }

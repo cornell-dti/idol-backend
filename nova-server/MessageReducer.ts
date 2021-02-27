@@ -5,13 +5,14 @@ import {
   MessageResponse,
   ErrorResponse,
   MemberResponse,
-  ImageResponse,
+  ImageResponse
 } from './ResponseTypes';
 
 const fs = require('fs');
-const dirPath: string = 'nova-server/members/';
 
-export let messageReducer = async (
+const dirPath = 'nova-server/members/';
+
+export const messageReducer = async (
   req: Request,
   res: Response
 ): Promise<MessageResponse> => {
@@ -24,17 +25,17 @@ export let messageReducer = async (
 let updateMemberInfo = async (
   member: Member
 ): Promise<MemberResponse | ErrorResponse> => {
-  let netId: string = getNetId(member.email);
-  let data = JSON.stringify(member);
+  const netId: string = getNetId(member.email);
+  const data = JSON.stringify(member);
 
   let response;
   try {
-    fs.writeFileSync(dirPath + `${netId}.json`, data);
-    response = { status: 200, member: member };
+    fs.writeFileSync(`${dirPath}${netId}.json`, data);
+    response = { status: 200, member };
   } catch {
     response = {
       status: 500,
-      error: `The server was unable to update member with NetID ${netId}`,
+      error: `The server was unable to update member with NetID ${netId}`
     };
   }
   return response;
@@ -45,6 +46,6 @@ let updateMemberImage = async (
 ): Promise<ImageResponse | ErrorResponse> => {
   return {
     status: 500,
-    error: 'Unimplemented',
+    error: 'Unimplemented'
   };
 };

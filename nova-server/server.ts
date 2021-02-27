@@ -10,7 +10,7 @@ const PORT = 3000;
 app.use(bodyParser.json());
 
 router.post('/message', async (req: Request, res: Response) => {
-  let handled = await messageReducer(req, res);
+  const handled = await messageReducer(req, res);
   res.status(handled.status).json(handled);
 });
 
