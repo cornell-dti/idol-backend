@@ -1,3 +1,7 @@
+// We need to import dotenv first to initialize env vars.
+/* eslint-disable import/first */
+require('dotenv').config();
+
 import express from 'express';
 import serverless from 'serverless-http';
 import cors from 'cors';
@@ -14,8 +18,6 @@ import {
 } from './memberAPI';
 import { getAllRoles } from './roleAPI';
 import { allTeams, setTeam, deleteTeam } from './teamAPI';
-
-require('dotenv').config();
 
 // Constants and configurations
 const app = express();
