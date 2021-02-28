@@ -1,5 +1,7 @@
 import admin from 'firebase-admin';
 
+require('dotenv').config();
+
 const serviceAccount = require('../resources/idol-b6c68-firebase-adminsdk-h4e6t-40e4bd5536.json');
 
 const configureAccount = (sa) => {
