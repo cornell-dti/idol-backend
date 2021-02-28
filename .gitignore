@@ -1,5 +1,5 @@
 node_modules/
-
+.DS_Store
 build/
 
 functions/
@@ -7,3 +7,4 @@ functions/
 .env
 
 scripts/members/*
+data/members/*

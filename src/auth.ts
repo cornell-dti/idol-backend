@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from './firebase';
 import { enforceSession } from './api';
-import { ErrorResponse } from './types/APITypes';
 
-export let authenticateUser = async (
+export const authenticateUser = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -12,13 +11,13 @@ export let authenticateUser = async (
     // on login
     next();
   } else if (!enforceSession || req.session?.isLoggedIn) {
-    let user = await (
-      await db.doc('members/' + req.session.email).get()
+    const user = await (
+      await db.doc(`members/${req.session!.email}`).get()
     ).data();
     if (!user) {
       res.status(401).json({
         status: 401,
-        error: 'No user with email: ' + req.session.email,
+        error: `No user with email: ${req.session!.email}`
       });
     } else {
       res.locals.user = user;
