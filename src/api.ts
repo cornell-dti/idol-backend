@@ -22,7 +22,7 @@ const db = database;
 const PORT = process.env.PORT || 9000;
 const isProd: boolean = JSON.parse(process.env.IS_PROD as string);
 const allowAllOrigins = false;
-const enforceSession = true;
+export const enforceSession = true;
 // eslint-disable-next-line no-nested-ternary
 const allowedOrigins = allowAllOrigins
   ? [/.*/]
@@ -89,9 +89,6 @@ router.post('/login', async (req, res) => {
         if (err) sessionErrCb(err);
         res.json({ isLoggedIn: true });
       });
-    })
-    .catch(() => {
-      res.json({ isLoggedIn: false });
     });
 });
 

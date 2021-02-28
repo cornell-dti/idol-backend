@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { checkLoggedIn } from './api';
+import MembersDao from './dao/MembersDao';
 import { db } from './firebase';
+import { checkLoggedIn } from './api';
 import { PermissionsManager } from './permissions';
 import { Member } from './DataTypes';
 import { ErrorResponse, MemberResponse, AllMembersResponse } from './APITypes';
@@ -10,15 +11,10 @@ export const allMembers = async (
   res: Response
 ): Promise<AllMembersResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
-    const members: Member[] = await db
-      .collection('members')
-      .get()
-      .then((vals) => {
-        return vals.docs.map((doc) => doc.data()) as Member[];
-      });
+    const result = await MembersDao.getAllMembers();
     return {
       status: 200,
-      members
+      members: result.members
     };
   }
   return undefined;
@@ -53,22 +49,11 @@ export const setMember = async (
         error: "Couldn't edit member with undefined email!"
       };
     }
-    const response: MemberResponse | ErrorResponse = await db
-      .doc(`members/${req.body.email}`)
-      .set(req.body)
-      .then(() => {
-        return {
-          status: 200,
-          member: req.body
-        };
-      })
-      .catch((reason) => {
-        return {
-          status: 500,
-          error: `Couldn't edit member ${req.body.email} for reason: ${reason}`
-        };
-      });
-    return response;
+    const result = await MembersDao.setMember(req.body.email, req.body);
+    if (result.isSuccessful) {
+      return { status: 200, member: result.member };
+    }
+    return { error: result.error!, status: 500 };
   }
   return undefined;
 };
@@ -114,31 +99,11 @@ export const updateMember = async (
         } does not have permission to edit member name or roles!`
       };
     }
-    const member = await (
-      await db.doc(`members/${req.body.email}`).get()
-    ).data();
-    if (!member) {
-      return {
-        status: 404,
-        error: `No member with email ${req.body.email}`
-      };
+    const result = await MembersDao.updateMember(req.body.email, req.body);
+    if (result.isSuccessful) {
+      return { member: result.member, status: 200 };
     }
-    const response: MemberResponse | ErrorResponse = await db
-      .doc(`members/${req.body.email}`)
-      .update(req.body)
-      .then(() => {
-        return {
-          status: 200,
-          member: req.body
-        };
-      })
-      .catch((reason) => {
-        return {
-          status: 500,
-          error: `Couldn't edit member ${req.body.email} for reason: ${reason}`
-        };
-      });
-    return response;
+    return { status: 500, error: result.error! };
   }
   return undefined;
 };
@@ -151,7 +116,6 @@ export const getMember = async (
     const user = await (
       await db.doc(`members/${req.session!.email}`).get()
     ).data();
-    console.log(user);
     if (!user) {
       return {
         status: 401,
@@ -168,37 +132,25 @@ export const getMember = async (
         } does not have permission to get members!`
       };
     }
-    const response: MemberResponse | ErrorResponse = await db
-      .doc(`members/${req.params.email}`)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          return {
-            status: 200,
-            member: doc.data() as Member
-          };
-        }
-
-        return {
-          status: 404,
-          error: `No member with email: ${req.params.email}`
-        };
-      })
-      .catch((reason) => {
-        return {
-          status: 500,
-          error: `Couldn't get member ${req.params.email} for reason: ${reason}`
-        };
-      });
-    return response;
+    const result = await MembersDao.getMember(memberEmail);
+    if (!result.member) {
+      return {
+        status: 404,
+        error: `Member with email: ${memberEmail} does not exist`
+      };
+    }
+    return {
+      member: result.member as Member,
+      status: 200
+    };
   }
   return undefined;
 };
 
-export const deleteMember = async function (
+export const deleteMember = async (
   req: Request,
   res: Response
-): Promise<MemberResponse | ErrorResponse | undefined> {
+): Promise<MemberResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
     const user = await (
       await db.doc(`members/${req.session!.email}`).get()
@@ -224,22 +176,11 @@ export const deleteMember = async function (
         error: "Couldn't delete member with undefined email!"
       };
     }
-    const response: MemberResponse | ErrorResponse = await db
-      .doc(`members/${req.body.email}`)
-      .delete()
-      .then(() => {
-        return {
-          status: 200,
-          member: req.body
-        };
-      })
-      .catch((reason) => {
-        return {
-          status: 500,
-          error: `Couldn't delete member for reason: ${reason}`
-        };
-      });
-    return response;
+    const result = await MembersDao.deleteMember(req.body.email);
+    if (result.isSuccessful) {
+      return { member: result.member, status: 200 };
+    }
+    return { status: 500, error: result.error! };
   }
   return undefined;
 };

@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 import { db } from './firebase';
 import { PermissionsManager } from './permissions';
 import { checkLoggedIn } from './api';
-import { materialize } from './util';
-import { Team, DBTeam } from './DataTypes';
-
+import { Team } from './DataTypes';
+import TeamsDao from './dao/TeamsDao';
 import { ErrorResponse, TeamResponse, AllTeamsResponse } from './APITypes';
 
 export const allTeams = async (
@@ -13,14 +11,8 @@ export const allTeams = async (
   res: Response
 ): Promise<AllTeamsResponse | ErrorResponse | undefined> => {
   if (checkLoggedIn(req, res)) {
-    const teamRefs = await db.collection('teams').get();
-    const resp = await Promise.all(
-      teamRefs.docs.map((teamRef) => materialize(teamRef.data()))
-    );
-    return {
-      status: 200,
-      teams: resp
-    };
+    const result = await TeamsDao.getAllTeams();
+    return { status: 200, teams: result.teams };
   }
   return undefined;
 };
@@ -55,39 +47,11 @@ export const setTeam = async (
         error: 'Malformed members on POST!'
       };
     }
-    const teamRef: DBTeam = {
-      uuid: teamBody.uuid ? teamBody.uuid : uuidv4(),
-      name: teamBody.name,
-      leaders: teamBody.leaders.map((leader) =>
-        db.doc(`members/${leader.email}`)
-      ),
-      members: teamBody.members.map((mem) => db.doc(`members/${mem.email}`))
-    };
-    const existRes = await Promise.all(
-      teamRef.leaders
-        .concat(teamRef.members)
-        .map((ref) => ref.get().then((val) => val.exists))
-    );
-    if (existRes.findIndex((val) => val === false) !== -1) {
-      return {
-        status: 404,
-        error: "Couldn't create team from members that don't exist!"
-      };
+    const result = await TeamsDao.setTeam(teamBody);
+    if (result.isSuccessful) {
+      return { status: 200, team: result.team };
     }
-    db.doc(`teams/${teamRef.uuid}`)
-      .set(teamRef)
-      .then(() => {
-        return {
-          status: 200,
-          team: { ...teamBody, uuid: teamRef.uuid }
-        };
-      })
-      .catch((reason) => {
-        return {
-          status: 500,
-          error: `Couldn't edit team for reason: ${reason}`
-        };
-      });
+    return { status: 500, error: result.error! };
   }
   return undefined;
 };
@@ -123,20 +87,11 @@ export const deleteTeam = async (
         } does not have permission to delete teams!`
       };
     }
-    db.doc(`teams/${teamBody.uuid}`)
-      .delete()
-      .then(() => {
-        return {
-          status: 200,
-          team: teamBody
-        };
-      })
-      .catch((reason) => {
-        return {
-          status: 500,
-          error: `Couldn't delete team for reason: ${reason}`
-        };
-      });
+    const result = await TeamsDao.deleteTeam(teamBody.uuid);
+    if (result.isSuccessful) {
+      return { status: 200, team: teamBody };
+    }
+    return { status: 500, error: result.error! };
   }
   return undefined;
 };
