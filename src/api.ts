@@ -15,8 +15,6 @@ import {
 import { getAllRoles } from './roleAPI';
 import { allTeams, setTeam, deleteTeam } from './teamAPI';
 
-require('dotenv').config();
-
 // Constants and configurations
 const app = express();
 const router = express.Router();
